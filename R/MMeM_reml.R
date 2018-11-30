@@ -1,0 +1,360 @@
+library(MASS)
+library(Matrix)
+library(psych)
+
+
+Z<-matrix(c(1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1),9,3)
+ZtZ<-Z%*%t(Z)
+X<-cbind(rep(1,9),rep(c(1,2,3),3))
+B<-matrix(c(2,3,2.5,3.5),2,2)
+T<-matrix(c(1,0.5,0.5,1),2,2)
+E<-matrix(c(1,0.3,0.3,1),2,2)
+I<-diag(1,9)
+N<-nrow(I)
+
+n<-10000
+E_result<-matrix(0,n,4)
+D_result<-matrix(0,n,4)
+B_result<-matrix(0,n,4)
+E_anova<-matrix(0,n,4)
+D_anova<-matrix(0,n,4)
+for (i in 1:n){
+  U<-mvrnorm(n=3,mu=c(0,0), Sigma=T)
+  E<-mvrnorm(n=9,mu=c(0,0), Sigma=E)
+
+  Y<-X%*%B+Z%*%U+E
+  HX<-X%*%ginv(t(X)%*%X)%*%t(X)
+  XZ<- cbind(X,Z[,-3])
+  HXZ<-XZ%*%ginv(t(XZ)%*%XZ)%*%t(XZ)
+  Pz<-Z%*%ginv(t(Z)%*%Z)%*%t(Z)
+  Qz<-I-Pz
+  QzY<-Qz%*%(X%*%B+Z%*%U+E)
+  PzY<-Pz%*%(X%*%B+Z%*%U+E)
+  QzX<-Qz%*%X
+  PzX<-Pz%*%X
+  QzH<-QzX%*%ginv(t(QzX)%*%QzX)%*%t(QzX)
+  PzH<-PzX%*%ginv(t(PzX)%*%PzX)%*%t(PzX)
+  SSE_Q<-t(QzY)%*%QzY-t(QzY)%*%QzH%*%QzY
+  SSE_P<-t(PzY)%*%PzY-t(PzY)%*%PzH%*%PzY
+
+  Lambda_E<-SSE_Q/(tr(Qz)-rankMatrix(QzX)[1])
+  Lambda_U<-SSE_P/(tr(Pz)-rankMatrix(PzX)[1])
+  D_tilda<-(Lambda_U-Lambda_E)/3
+  B_tilda<-ginv(t(PzX)%*%PzX)%*%t(PzX)%*%PzY
+  E_result[i,]<-c(Lambda_E)
+  D_result[i,]<-c(D_tilda)
+  B_result[i,]<-c(B_tilda)
+
+  ###HendersonIII
+  SSE<-t(Y)%*%Y-t(Y)%*%HXZ%*%Y
+  E_aov<-SSE/sum(diag(I-HXZ))
+  E_anova[i,]<-E_aov
+  SSD<-t(Y)%*%HXZ%*%Y-t(Y)%*%HX%*%Y
+  D_aov<-(SSD-E_aov*sum(diag(HXZ-HX)))/tr(Z%*%t(Z)%*%(I-HX))
+  D_anova[i,]<-D_aov
+}
+
+rbind(colMeans(E_result),apply(E_result,2, sd))
+rbind(colMeans(D_result),apply(D_result,2, sd))
+#colMeans(B_result)
+rbind(colMeans(E_anova),apply(E_anova,2, sd))
+rbind(colMeans(D_anova),apply(D_anova,2, sd))
+
+b<-sum(diag(Qz-QzH))
+a<-sum(diag(Pz-PzH))
+t<-3
+c<-tr(I-HXZ)
+d<-tr(HXZ-HX)
+e<-tr(Z%*%t(Z)%*%(I-HX))
+A<-(b*Pz%*%(I-PzH)%*%Pz-a*Qz%*%(I-QzH)%*%Qz)/(a*b*t)
+B<-(HXZ-HX-d*(I-HXZ)/c)/e
+
+##multivariate REML
+library(matlib)
+library(nleqslv)
+library(matrixcalc)
+library(jointDiag)
+
+#check Q
+#Q%*%E%*%t(Q)
+#Q%*%T-diag(gamma)%*%Q%*%E
+
+##Calculating random effect estimates using MME
+
+#data example in paper
+############################
+# z1 = c(rep(1,45))
+# z2 = c(rep(1,37))
+# z3 = c(rep(1,40))
+# z4 = c(rep(1,62))
+# z5 = c(rep(1,46))
+# z6 = c(rep(1,53))
+# z7 = c(rep(1,50))
+# z8 = c(rep(1,45))
+# z9 = c(rep(1,49))
+# z10= c(rep(1,47))
+# z11 = c(rep(1,47))
+# z12 = c(rep(1,53))
+# x1 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),18), 18,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
+# x2 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
+# x3 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),15), 15,3, byrow = TRUE),matrix(rep(c(1,0,0),14), 14,3, byrow = TRUE))
+# x4 = rbind(matrix(rep(c(1,1,0),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,1),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
+# x5 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),17), 17,3, byrow = TRUE))
+# x6 = rbind(matrix(rep(c(1,1,0),25), 25,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),9), 9,3, byrow = TRUE))
+# x7 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),21), 21,3, byrow = TRUE))
+# x8 = rbind(matrix(rep(c(1,1,0),12), 12,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
+# x9 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,0),15), 15,3, byrow = TRUE))
+# x10 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),11), 11,3, byrow = TRUE))
+# x11 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
+# x12 = rbind(matrix(rep(c(1,1,0),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,1),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,0),23), 23,3, byrow = TRUE))
+#
+#
+# y1 = c(62312,83649,61283,51583, 60905,56574, 46245, 69433,63068,98333, 98657, 94499, 58665, 72200, 82572, 129134, 94571,45611,
+#        60732, 71859, 102405, 58989, 57079, 95845, 82909, 81687, 73211, 73757, 86288, 47915, 62817, 56081, 91181, 75513, 62786, 105979)
+# y2 = c(2434, 3084, 2267, 1995, 2169, 2202, 1814, 2519, 2405, 3755, 3871, 3644, 2131, 2630, 2874, 4605, 3372, 1613,
+#        2202, 2624, 3558, 2102, 2129, 3647, 3200, 3043, 2808, 2931, 3234, 1931, 2375, 2438, 3827, 2854, 2573, 3911)
+# #initial E and T
+# T.start = matrix(c(30000,900,900,50),2,2)
+# E.start = matrix(c(360000,6800,6800,600),2,2)
+#
+# ind = cumsum(c(1,14,18,13,11,13,13,11,15,14,21,21,20,13,16,17,25,19,9,13,16,21,12,13,20,17,17,15,17,19,11,14,13,20,16,14,23))
+# N = 574
+# Z = as.matrix(bdiag(z1, z2, z3,z4,z5,z6,z7,z8,z9,z10,z11,z12))
+# I = diag(1, N)
+# X = rbind(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12)
+
+# find_Q <- function(T, E){
+#   Ev= eigen(E)
+#   Evalue =Ev$values
+#   Evec = Ev$vectors
+#   E_neg0.5 = Evec %*%diag(1/sqrt(Evalue))%*%t(Evec)
+#   gamma = eigen(E_neg0.5%*%T%*%E_neg0.5)$values
+#   fn <- function(c){
+#     y <- numeric(q*q)
+#     y[1] <- (T[1,2]-gamma[1]*E[1,2])*c[1]+(T[2,2]-gamma[1]*E[2,2])*c[2]
+#     y[2] <- (T[1,1]-gamma[2]*E[1,1])*c[3]+(T[1,2]-gamma[2]*E[1,2])*c[4]
+#     y[3] <- (E[1,1]*c[1]+E[1,2]*c[2])*c[1]+(E[2,1]*c[1]+E[2,2]*c[2])*c[2]-1
+#     y[4] <- (E[1,1]*c[3]+E[1,2]*c[4])*c[3]+(E[2,1]*c[3]+E[2,2]*c[4])*c[4]-1
+#     return(y)
+#   }
+#   cstart <- c(1,1,1,1)
+#   result <- nleqslv(cstart, fn, control=list(btol=0.001,allowSingular=TRUE))
+#   Q = matrix(result$x,q,q,byrow=TRUE)
+#   return(Q)
+# }
+######################
+
+
+##finding Q and checking Q
+find_Q <- function(T,E){
+  C = array(NA, dim=c(q,q,2))
+
+   if(det(T) <= 0){
+    T = as.matrix(nearPD(T)$mat)
+  }
+    if(det(E) <= 0){
+    E = as.matrix(nearPD(E)$mat)
+  }
+
+  C[,,1] = T
+  C[,,2] = E
+  Q_est = jadiag(C)$B
+  Q_adj = Q_est%*%C[,,2]%*%t(Q_est)
+  Q_adj[upper.tri(Q_adj)] = 0
+  Q_adj[lower.tri(Q_adj)]= 0
+  Q_est_adj = solve(sqrt(Q_adj))%*%Q_est
+  return(list(Q = Q_est_adj, T=T, E=E))
+}
+
+check_Q <- function(Q,T,E){
+  QTQ = Q%*%T%*%t(Q)
+  QEQ = Q%*%E%*%t(Q)
+  if(is.diagonal.matrix(QTQ) == TRUE & is.diagonal.matrix(QEQ) == TRUE){
+    print('----- Q is good -----')
+  }else{
+    print('----- Q is not good -----')
+    return('fail')
+  }
+}
+
+#####main function of multivariate mixed effects model_REML#####
+
+MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
+  T = T.start
+  E = E.start
+
+  ###ZHZ
+  H = I-X%*%ginv(t(X)%*%X)%*%t(X)
+  h = ncol(X)
+  s = ncol(Z)
+  ZH = t(Z)%*%H
+  #zh = function(matrix){
+  #  return(matrix[head(ind,-1)])
+  #}
+  #ZH_row = t(apply(ZH, 1, zh))
+  ZHZ = t(Z)%*%H%*%Z
+
+  for(iter in 1:maxit){
+    print(iter)
+
+    Q_results = find_Q(T, E)
+    Q = Q_results$Q
+    T = Q_results$T
+    E =  Q_results$E
+
+    Check_Q = check_Q(Q, T, E)
+    if(Check_Q =='fail'){
+      break
+    }
+    Q_inv = solve(Q)
+
+    ####ZHy, Lambda, yHy, traces of C and CC, u_c
+    Lambda= diag(Q%*%T%*%t(Q))
+
+    Cc = list()
+    Cc_trace = double(q)
+    for(i in 1:q){
+      Cc[[i]] = solve(ZHZ+(1/Lambda[i])*diag(s))
+      Cc_trace[i] = tr(Cc[[i]])
+    }
+
+    CcCc_trace = matrix(0,q,q)
+    for(i in 1:q){
+      for(j in 1:q){
+        CcCc_trace[i,j] = tr(Cc[[i]]%*%Cc[[j]])
+      }
+    }
+
+    ZHy_c = list()
+    y_c = list()
+    u_c = list()
+    for(i in 1:q){
+      y_c[[i]] = Q[i,1]*y1+ Q[i,2]*y2
+      ZHy_c[[i]] = ZH%*%y_c[[i]]
+      u_c[[i]] = Cc[[i]]%*%ZHy_c[[i]]
+    }
+
+    ycHyc = matrix(0,q,q)
+    for(i in 1:q){
+      for(j in 1:q){
+        #yc1Hyc1 = (Q[1,1]^2)*144609687+2*Q[1,1]*Q[1,2]*2734679+(Q[1,2]^2)*232736.6
+        #yc1Hyc2 = (Q[1,1]*Q[2,1])*144609687+Q[1,1]*Q[2,2]*2734679+Q[1,2]*Q[2,1]*2734679+(Q[1,2]*Q[2,2])*232736.6
+        #yc2Hyc2 = (Q[2,1]^2)*144609687+2*Q[2,1]*Q[2,2]*2734679+(Q[2,2]^2)*232736.6
+        ycHyc[i,j] = t(y_c[[i]])%*%H%*%y_c[[j]]
+      }
+    }
+
+    ###REML equations
+    BTT=matrix(0,q,q)
+    BTE=matrix(0,q,q)
+    BEE=matrix(0,q,q)
+    dT=matrix(0,q,q)
+    dE=matrix(0,q,q)
+    for(i in 1:q){
+      for(j in i:q){
+        BTT[i,j] = s - ((1/Lambda[i])*Cc_trace[i]+(1/Lambda[j])*Cc_trace[j])+ (1/(Lambda[i]*Lambda[j]))*CcCc_trace[i,j]
+        BTE[i,j] = 0.5*(Cc_trace[i]+Cc_trace[j]-(1/Lambda[i]+1/Lambda[j])*CcCc_trace[i,j])
+        BEE[i,j] = Lambda[i]*Lambda[j]*(N-h-s)+CcCc_trace[i,j]
+        dT[i,j] = t(u_c[[i]])%*%u_c[[j]]
+        dE[i,j] = Lambda[i]*Lambda[j]*(ycHyc[i,j]-t(u_c[[i]])%*%ZHy_c[[j]]-(1/Lambda[i])*t(u_c[[i]])%*%u_c[[j]])
+      }
+    }
+
+    oldT = T
+    oldE = E
+
+    B = bdiag(matrix(c(BTT[1,1],BTE[1,1],BTE[1,1], BEE[1,1]),2,2), matrix(c(BTT[1,2],BTE[1,2],BTE[1,2], BEE[1,2]),2,2),matrix(c(BTT[2,2],BTE[2,2],BTE[2,2], BEE[2,2]),2,2))
+    d = rbind(matrix(c(dT[1,1], dE[1,1]),2,1), matrix(c(dT[1,2], dE[1,2]),2,1),matrix(c(dT[2,2], dE[2,2]),2,1))
+    thetas = solve(B)%*%d
+
+    T.new = Matrix(0,2,2)
+    T.new[upper.tri(T.new,diag=TRUE)] =thetas[c(1,3,5)] #work correctly on q=2
+    T.new = forceSymmetric(T.new, uplo = 'U')
+    E.new = Matrix(0,2,2)
+    E.new[upper.tri(E.new,diag=TRUE)] =thetas[c(2,4,6)] #work correctly on q=2
+    E.new = forceSymmetric(E.new, uplo = 'U')
+
+    T = as.matrix(Q_inv%*%T.new%*%t(Q_inv))
+    E = as.matrix(Q_inv%*%E.new%*%t(Q_inv))
+
+    if(max(abs(T-oldT)) < sqrt(tol) & max(abs(E-oldE))< sqrt(tol)){
+      break
+    }
+  }
+
+  return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)]))
+}
+
+
+q =2
+s = 12
+p = 3
+
+
+z1 = c(rep(1,45))
+z2 = c(rep(1,37))
+z3 = c(rep(1,40))
+z4 = c(rep(1,62))
+z5 = c(rep(1,46))
+z6 = c(rep(1,53))
+z7 = c(rep(1,50))
+z8 = c(rep(1,45))
+z9 = c(rep(1,49))
+z10= c(rep(1,47))
+z11 = c(rep(1,47))
+z12 = c(rep(1,53))
+x1 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),18), 18,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
+x2 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
+x3 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),15), 15,3, byrow = TRUE),matrix(rep(c(1,0,0),14), 14,3, byrow = TRUE))
+x4 = rbind(matrix(rep(c(1,1,0),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,1),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
+x5 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),17), 17,3, byrow = TRUE))
+x6 = rbind(matrix(rep(c(1,1,0),25), 25,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),9), 9,3, byrow = TRUE))
+x7 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),21), 21,3, byrow = TRUE))
+x8 = rbind(matrix(rep(c(1,1,0),12), 12,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
+x9 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,0),15), 15,3, byrow = TRUE))
+x10 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),11), 11,3, byrow = TRUE))
+x11 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
+x12 = rbind(matrix(rep(c(1,1,0),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,1),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,0),23), 23,3, byrow = TRUE))
+#ind = cumsum(c(1,14,18,13,11,13,13,11,15,14,21,21,20,13,16,17,25,19,9,13,16,21,12,13,20,17,17,15,17,19,11,14,13,20,16,14,23))
+N = 574
+Z = as.matrix(bdiag(z1, z2, z3,z4,z5,z6,z7,z8,z9,z10,z11,z12))
+I = diag(1, N)
+X = rbind(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12)
+
+#Z<-matrix(c(1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1),9,3)
+ZtZ<-Z%*%t(Z)
+#X<-cbind(rep(1,9),rep(c(1,2,3),3))
+B<-matrix(c(2, 3, 1, 2.5, 3.5, 1.5),3,2)
+T.true<-matrix(c(100,5,5,10),2,2)
+E.true<-matrix(c(60,13,13,40),2,2)
+
+#I<-diag(1,9)
+h = ncol(X)
+s = ncol(Z)
+q = 2
+n = 500
+
+#initial E and T
+T.start = matrix(c(10,5,5,15),2,2)
+E.start = matrix(c(6,1,1,3),2,2)
+
+T_ = matrix(0, n,3)
+E_ = matrix(0, n,3)
+for (i in 1:n){
+  U<-mvrnorm(n = s, mu=c(0,0), Sigma=T.true)
+  e<-mvrnorm(n = N, mu=c(0,0), Sigma=E.true)
+  Y<-X%*%B+Z%*%U+e
+  y1 = Y[,1]
+  y2 = Y[,2]
+  results = MMeM_reml(T.start, T.start)
+  T_[i,] = results$T.estimates
+  E_[i,] = results$E.estimates
+}
+# Q <- matrix(c(0.001608,0.000975,-0.039382,0.023869),2,2)
+# Q%*%E%*%t(Q)
+# Q%*%T%*%t(Q)
+
+
+
+
+
