@@ -76,16 +76,26 @@ library(jointDiag)
 ######################
 
 
-##finding Q and checking Q
+#' finding Q and checking Q
+#'
+#' @param T
+#' @param E
+#'
+#' @example
+#'
+#' @import matrixcalc
+#' @import jointDiag
+#'
+#' @export
 find_Q <- function(T,E){
   C = array(NA, dim=c(q,q,2))
 
-   if(det(T) <= 0){
-    T = as.matrix(nearPD(T)$mat)
-  }
-    if(det(E) <= 0){
-    E = as.matrix(nearPD(E)$mat)
-  }
+  #  if(det(T) <= 0){
+  #   T = as.matrix(nearPD(T)$mat)
+  # }
+  #   if(det(E) <= 0){
+  #   E = as.matrix(nearPD(E)$mat)
+  # }
 
   C[,,1] = T
   C[,,2] = E
@@ -94,7 +104,7 @@ find_Q <- function(T,E){
   Q_adj[upper.tri(Q_adj)] = 0
   Q_adj[lower.tri(Q_adj)]= 0
   Q_est_adj = solve(sqrt(Q_adj))%*%Q_est
-  return(list(Q = Q_est_adj, T=T, E=E))
+  return(list(Q = Q_est_adj))#, T=T, E=E))
 }
 
 check_Q <- function(Q,T,E){
@@ -108,6 +118,8 @@ check_Q <- function(Q,T,E){
   }
 }
 
+odd <- function(x) x%%2 != 0
+even <- function(x) x%%2 == 0
 #####main function of multivariate mixed effects model_REML#####
 
 MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
@@ -130,13 +142,14 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
 
     Q_results = find_Q(T, E)
     Q = Q_results$Q
-    T = Q_results$T
-    E =  Q_results$E
+    #T = Q_results$T
+    #E =  Q_results$E
 
     Check_Q = check_Q(Q, T, E)
     if(Check_Q =='fail'){
       break
     }
+
     Q_inv = solve(Q)
 
     ####ZHy, Lambda, yHy, traces of C and CC, u_c
@@ -160,7 +173,11 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     y_c = list()
     u_c = list()
     for(i in 1:q){
-      y_c[[i]] = Q[i,1]*y1+ Q[i,2]*y2
+      if(q == 1){
+        y_c[[i]] = Q[i,1]*y1
+      }else{
+        y_c[[i]] = Q[i,1]*y1+ Q[i,2]*y2
+      }
       ZHy_c[[i]] = ZH%*%y_c[[i]]
       u_c[[i]] = Cc[[i]]%*%ZHy_c[[i]]
     }
@@ -176,33 +193,45 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     }
 
     ###REML equations
-    BTT=matrix(0,q,q)
-    BTE=matrix(0,q,q)
-    BEE=matrix(0,q,q)
-    dT=matrix(0,q,q)
-    dE=matrix(0,q,q)
+    BTTc=matrix(0,q,q)
+    BTEc=matrix(0,q,q)
+    BEEc=matrix(0,q,q)
+    dTc=matrix(0,q,q)
+    dEc=matrix(0,q,q)
     for(i in 1:q){
-      for(j in i:q){
-        BTT[i,j] = s - ((1/Lambda[i])*Cc_trace[i]+(1/Lambda[j])*Cc_trace[j])+ (1/(Lambda[i]*Lambda[j]))*CcCc_trace[i,j]
-        BTE[i,j] = 0.5*(Cc_trace[i]+Cc_trace[j]-(1/Lambda[i]+1/Lambda[j])*CcCc_trace[i,j])
-        BEE[i,j] = Lambda[i]*Lambda[j]*(N-h-s)+CcCc_trace[i,j]
-        dT[i,j] = t(u_c[[i]])%*%u_c[[j]]
-        dE[i,j] = Lambda[i]*Lambda[j]*(ycHyc[i,j]-t(u_c[[i]])%*%ZHy_c[[j]]-(1/Lambda[i])*t(u_c[[i]])%*%u_c[[j]])
+      for(j in 1:q){
+        BTTc[i,j] = s - ((1/Lambda[i])*Cc_trace[i]+(1/Lambda[j])*Cc_trace[j])+ (1/(Lambda[i]*Lambda[j]))*CcCc_trace[i,j]
+        BTEc[i,j] = 0.5*(Cc_trace[i]+Cc_trace[j]-(1/Lambda[i]+1/Lambda[j])*CcCc_trace[i,j])
+        BEEc[i,j] = Lambda[i]*Lambda[j]*(N-h-s)+CcCc_trace[i,j]
+        dTc[i,j] = t(u_c[[i]])%*%u_c[[j]]
+        dEc[i,j] = Lambda[i]*Lambda[j]*(ycHyc[i,j]-t(u_c[[i]])%*%ZHy_c[[j]]-(1/Lambda[i])*t(u_c[[i]])%*%u_c[[j]])
       }
     }
 
     oldT = T
     oldE = E
 
-    B = bdiag(matrix(c(BTT[1,1],BTE[1,1],BTE[1,1], BEE[1,1]),2,2), matrix(c(BTT[1,2],BTE[1,2],BTE[1,2], BEE[1,2]),2,2),matrix(c(BTT[2,2],BTE[2,2],BTE[2,2], BEE[2,2]),2,2))
-    d = rbind(matrix(c(dT[1,1], dE[1,1]),2,1), matrix(c(dT[1,2], dE[1,2]),2,1),matrix(c(dT[2,2], dE[2,2]),2,1))
-    thetas = solve(B)%*%d
+    thetas = c()
+    #VaCov = bdiag()
+    for(i in 1:q){
+      for(j in i:q){
+        Bc = matrix(c(BTTc[i,j],BTEc[i,j],BTEc[i,j], BEEc[i,j]),2,2)
+        dc = matrix(c(dTc[i,j], dEc[i,j]),2,1)
+        new_thetas = solve(Bc)%*%dc
+        thetas <- c(thetas, new_thetas)
+        #VaCov = bdiag(VaCov,2*solve(Bc))
+      }
+    }
 
-    T.new = Matrix(0,2,2)
-    T.new[upper.tri(T.new,diag=TRUE)] =thetas[c(1,3,5)] #work correctly on q=2
+    # B = bdiag(matrix(c(BTT[1,1],BTE[1,1],BTE[1,1], BEE[1,1]),2,2), matrix(c(BTT[1,2],BTE[1,2],BTE[1,2], BEE[1,2]),2,2),matrix(c(BTT[2,2],BTE[2,2],BTE[2,2], BEE[2,2]),2,2))
+    # d = rbind(matrix(c(dT[1,1], dE[1,1]),2,1), matrix(c(dT[1,2], dE[1,2]),2,1),matrix(c(dT[2,2], dE[2,2]),2,1))
+    # thetas = solve(B)%*%d
+
+    T.new = Matrix(0,q,q)
+    T.new[upper.tri(T.new,diag=TRUE)] =thetas[odd(1:length(thetas))]  #work correctly on q=2
     T.new = forceSymmetric(T.new, uplo = 'U')
-    E.new = Matrix(0,2,2)
-    E.new[upper.tri(E.new,diag=TRUE)] =thetas[c(2,4,6)] #work correctly on q=2
+    E.new = Matrix(0,q,q)
+    E.new[upper.tri(E.new,diag=TRUE)] =thetas[even(1:length(thetas))]  #work correctly on q=2
     E.new = forceSymmetric(E.new, uplo = 'U')
 
     T = as.matrix(Q_inv%*%T.new%*%t(Q_inv))
@@ -213,10 +242,17 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     }
   }
 
+  # VaCov = 2*solve(B)
+  #
+  # dimnames = list(c('Block!y1:y1', 'Residual!y1:y1', 'Block!y1:y2', 'Residual!y1:y2','Block!y2:y2', 'Residual!y2:y2'),
+  #                 c('Block!y1:y1', 'Residual!y1:y1', 'Block!y1:y2', 'Residual!y1:y2','Block!y2:y2', 'Residual!y2:y2'))
+  #
+  # VaCov_sparse = Matrix(VaCov, sparse = TRUE, dimnames = dimnames)
+
   return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)]))
 }
 
-
+############## TEST ON BIVARIATE CASE SIMULATION
 q =2
 s = 12
 p = 3
@@ -263,7 +299,7 @@ E.true<-matrix(c(60,13,13,40),2,2)
 h = ncol(X)
 s = ncol(Z)
 q = 2
-n = 500
+n = 50
 
 #initial E and T
 T.start = matrix(c(10,5,5,15),2,2)
@@ -285,7 +321,39 @@ for (i in 1:n){
 # Q%*%E%*%t(Q)
 # Q%*%T%*%t(Q)
 
+##### TEST ON UNIVARIATE CASE REAL DATA == UNIVARIATE REML
 
+y1 = as.matrix(getME(mod1, 'y'))
+X = as.matrix(getME(mod1, 'X'))
+Z = as.matrix(getME(mod1, 'Z'))
+N = 246
+I = diag(1, N)
+T.start = 3
+E.start = 4
+q = 1
+
+results = MMeM_reml(T.start, T.start)
+
+# > solve(Bc)*2
+# [,1]         [,2]
+# [1,]  0.051482907 -0.006049786
+# [2,] -0.006049786  0.018149359
+
+
+library(nlme)
+library(lme4)
+library(msm)
+alcohol1 <- read.table("https://stats.idre.ucla.edu/stat/r/examples/alda/data/alcohol1_pp.txt", header=T, sep=",")
+attach(alcohol1)
+model.c <- lme(alcuse ~ coa, data=alcohol1, random= ~ 1 | id)
+mod1<-lmer(alcuse ~ coa +(1|id) ,alcohol1,REML=1)
+intervals(model.c)
+re1 = c(0.5432737, 0.6785808, 0.8475873)
+log(re1)[2] - log(re1)[1]
+log(re1)[3] - log(re1)[2]
+var <-model.c$apVar
+par<-attr(var, "Pars")
+deltamethod (~ exp(x1)^2, par, var)
 
 
 
