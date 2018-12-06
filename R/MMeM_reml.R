@@ -131,10 +131,6 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
   h = ncol(X)
   s = ncol(Z)
   ZH = t(Z)%*%H
-  #zh = function(matrix){
-  #  return(matrix[head(ind,-1)])
-  #}
-  #ZH_row = t(apply(ZH, 1, zh))
   ZHZ = t(Z)%*%H%*%Z
 
   for(iter in 1:maxit){
@@ -142,8 +138,6 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
 
     Q_results = find_Q(T, E)
     Q = Q_results$Q
-    #T = Q_results$T
-    #E =  Q_results$E
 
     Check_Q = check_Q(Q, T, E)
     if(Check_Q =='fail'){
@@ -185,9 +179,6 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     ycHyc = matrix(0,q,q)
     for(i in 1:q){
       for(j in 1:q){
-        #yc1Hyc1 = (Q[1,1]^2)*144609687+2*Q[1,1]*Q[1,2]*2734679+(Q[1,2]^2)*232736.6
-        #yc1Hyc2 = (Q[1,1]*Q[2,1])*144609687+Q[1,1]*Q[2,2]*2734679+Q[1,2]*Q[2,1]*2734679+(Q[1,2]*Q[2,2])*232736.6
-        #yc2Hyc2 = (Q[2,1]^2)*144609687+2*Q[2,1]*Q[2,2]*2734679+(Q[2,2]^2)*232736.6
         ycHyc[i,j] = t(y_c[[i]])%*%H%*%y_c[[j]]
       }
     }
@@ -223,15 +214,11 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
       }
     }
 
-    # B = bdiag(matrix(c(BTT[1,1],BTE[1,1],BTE[1,1], BEE[1,1]),2,2), matrix(c(BTT[1,2],BTE[1,2],BTE[1,2], BEE[1,2]),2,2),matrix(c(BTT[2,2],BTE[2,2],BTE[2,2], BEE[2,2]),2,2))
-    # d = rbind(matrix(c(dT[1,1], dE[1,1]),2,1), matrix(c(dT[1,2], dE[1,2]),2,1),matrix(c(dT[2,2], dE[2,2]),2,1))
-    # thetas = solve(B)%*%d
-
     T.new = Matrix(0,q,q)
-    T.new[upper.tri(T.new,diag=TRUE)] =thetas[odd(1:length(thetas))]  #work correctly on q=2
+    T.new[upper.tri(T.new,diag=TRUE)] =thetas[odd(1:length(thetas))]
     T.new = forceSymmetric(T.new, uplo = 'U')
     E.new = Matrix(0,q,q)
-    E.new[upper.tri(E.new,diag=TRUE)] =thetas[even(1:length(thetas))]  #work correctly on q=2
+    E.new[upper.tri(E.new,diag=TRUE)] =thetas[even(1:length(thetas))]
     E.new = forceSymmetric(E.new, uplo = 'U')
 
     T = as.matrix(Q_inv%*%T.new%*%t(Q_inv))
@@ -242,12 +229,17 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     }
   }
 
-  # VaCov = 2*solve(B)
-  #
-  # dimnames = list(c('Block!y1:y1', 'Residual!y1:y1', 'Block!y1:y2', 'Residual!y1:y2','Block!y2:y2', 'Residual!y2:y2'),
-  #                 c('Block!y1:y1', 'Residual!y1:y1', 'Block!y1:y2', 'Residual!y1:y2','Block!y2:y2', 'Residual!y2:y2'))
-  #
-  # VaCov_sparse = Matrix(VaCov, sparse = TRUE, dimnames = dimnames)
+  Pc = list()
+  for(i in 1:q){
+    Pc[[i]]= H - H%*%Z%*%Cc[[i]]%*%t(Z)%*%H
+  }
+
+  P = Q[1,1]*Q[1,1]*Pc[[1]]
+
+  ZZ = Z%*%t(Z)
+
+  B = matrix(c(tr(P%*%ZZ%*%P%*%ZZ), tr(P%*%ZZ%*%P), tr(P%*%ZZ%*%P), tr(P%*%P)),2,2)
+  solve(B)*2
 
   return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)]))
 }
@@ -333,11 +325,6 @@ E.start = 4
 q = 1
 
 results = MMeM_reml(T.start, T.start)
-
-# > solve(Bc)*2
-# [,1]         [,2]
-# [1,]  0.051482907 -0.006049786
-# [2,] -0.006049786  0.018149359
 
 
 library(nlme)
