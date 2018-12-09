@@ -227,60 +227,21 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     }
   }
 
-  if(q ==1){
-    Vcov = solve(Bc%x%Q^4)*2
-  }else{
-    Vcov = solve(Bc%*%diag(c(rep(Q[1,1]^4,q),rep((Q[1,1]*Q[2,2]+Q[1,2]*Q[1,1])^2,q), rep(Q[2,2]^4,q))))*2
+  m = 0
+  deriv = c()
+  for(i in 1:q){
+    for(j in i:q){
+      m = m+1
+      D = matrix(0,q,q)
+      D[i,j] = 1
+      D = forceSymmetric(D, uplo = 'U')
+      deriv[m] = (Q%*%D%*%t(Q))[i,j]
+    }
   }
-  #q = 1
-   #
 
-  #q = 2
-  # Pc = list()
-  # for(i in 1:q){
-  #   Pc[[i]]= H - H%*%Z%*%Cc[[i]]%*%t(Z)%*%H
-  # }
-  # P = (t(Q)%x%diag(1,N))%*%bdiag(Pc)%*%(Q%x%diag(1,N))
-  # idx = list(c(1,1), c(1,2),c(2,2))
-  # ZZ = Z%*%t(Z)
-  # PZZ_TT = matrix(0,3,3)
-  # PZZ_TE = matrix(0,3,3)
-  # PZZ_EE = matrix(0,3,3)
-  # a=0
-  # for(i in idx){
-  #   a = a+1
-  #   k = i[1]
-  #   l = i[2]
-  #   D1 = matrix(0,q,q)
-  #   print(c(k, l))
-  #   D1[k,l] = 1
-  #   D1 = forceSymmetric(D1, uplo = 'U')
-  #   PDZZ1 = P%*%(D1 %x% ZZ)
-  #   PDI1= P%*%(D1%x%diag(1,N))
-  #   b=0
-  #   for(j in idx){
-  #     b = b+1
-  #     m = j[1]
-  #     n = j[2]
-  #     print(c(m, n))
-  #     D2 = matrix(0,q,q)
-  #     D2[m,n] = 1
-  #     D2 = forceSymmetric(D2, uplo = 'U')
-  #     PDZZ2 = P%*%(D2 %x% ZZ)
-  #     PDI2 = P%*%(D2%x%diag(1,N))
-  #
-  #     PZZ_TT[a,b] = tr(as.matrix(PDZZ1%*%PDZZ2))
-  #     PZZ_TE[a,b] = tr(as.matrix(PDZZ1%*%PDI2))
-  #     PZZ_EE[a,b] = tr(as.matrix(PDI1%*%PDI2))
-  #   }
-  # }
+  Vcov = solve(Bc%*%diag(rep(deriv^2,each = q)))*2
 
-Info = rbind(cbind(PZZ_TT, PZZ_TE), cbind(PZZ_TE, PZZ_EE))
-solve(Info)*2
-
-#Bc_shuf = rbind(cbind(diag(c(Bc[1,1],Bc[3,3],Bc[5,5])),diag(c(Bc[1,2],Bc[3,4],Bc[5,6]))),cbind(diag(c(Bc[2,1], Bc[4,3], Bc[6,5])), diag(c(Bc[2,2], Bc[4,4], Bc[6,6]))))
-
-  return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)])), VCOV = Vcov))
+  return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)], VCOV = Vcov))
 }
 
 ############## TEST ON BIVARIATE CASE SIMULATION
@@ -330,7 +291,7 @@ E.true<-matrix(c(60,13,13,40),2,2)
 h = ncol(X)
 s = ncol(Z)
 q = 2
-n = 50
+n = 1000
 
 #initial E and T
 T.start = matrix(c(10,5,5,15),2,2)
@@ -338,6 +299,7 @@ E.start = matrix(c(6,1,1,3),2,2)
 
 T_ = matrix(0, n,3)
 E_ = matrix(0, n,3)
+VC = list()
 for (i in 1:n){
   U<-mvrnorm(n = s, mu=c(0,0), Sigma=T.true)
   e<-mvrnorm(n = N, mu=c(0,0), Sigma=E.true)
@@ -347,7 +309,14 @@ for (i in 1:n){
   results = MMeM_reml(T.start, T.start)
   T_[i,] = results$T.estimates
   E_[i,] = results$E.estimates
+  VC[[i]] = results$VCOV
 }
+
+l = matrix(0,6,6)
+for(i in 1:n){l = l+VC[[i]]}
+sqrt(diag(l/n))
+
+
 # Q <- matrix(c(0.001608,0.000975,-0.039382,0.023869),2,2)
 # Q%*%E%*%t(Q)
 # Q%*%T%*%t(Q)
