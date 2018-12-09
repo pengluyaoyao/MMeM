@@ -191,10 +191,10 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     dEc=matrix(0,q,q)
     for(i in 1:q){
       for(j in 1:q){
-        BTTc[i,j] = (1/(Lambda[i]*Lambda[j])) * (s - ((1/Lambda[i])*Cc_trace[i]+(1/Lambda[j])*Cc_trace[j])+ (1/(Lambda[i]*Lambda[j]))*CcCc_trace[i,j])
+        BTTc[i,j] = 1/(Lambda[i]*Lambda[j]) * (s - ((1/Lambda[i])*Cc_trace[i]+(1/Lambda[j])*Cc_trace[j])+ (1/(Lambda[i]*Lambda[j]))*CcCc_trace[i,j])
         BTEc[i,j] = 0.5*(1/(Lambda[i]*Lambda[j])) *(Cc_trace[i]+Cc_trace[j]-(1/Lambda[i]+1/Lambda[j])*CcCc_trace[i,j])
         BEEc[i,j] = (N-h-s)+(1/(Lambda[i]*Lambda[j])) * CcCc_trace[i,j]
-        dTc[i,j] = (1/(Lambda[i]*Lambda[j])) * (t(u_c[[i]])%*%u_c[[j]])
+        dTc[i,j] = 1/(Lambda[i]*Lambda[j]) * (t(u_c[[i]])%*%u_c[[j]])
         dEc[i,j] = ycHyc[i,j]-t(u_c[[i]])%*%ZHy_c[[j]]-(1/Lambda[i])*t(u_c[[i]])%*%u_c[[j]]
       }
     }
@@ -206,8 +206,14 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     dc = c()
     for(i in 1:q){
       for(j in i:q){
-        Bc = bdiag(Bc, matrix(c(BTTc[i,j],BTEc[i,j],BTEc[i,j], BEEc[i,j]),2,2))
-        dc = c(dc, c(dTc[i,j], dEc[i,j]))
+        if(i == j){
+          Bc = bdiag(Bc, matrix(c(BTTc[i,j],BTEc[i,j],BTEc[i,j], BEEc[i,j]),2,2))
+          dc = c(dc, c(dTc[i,j], dEc[i,j]))
+        }else{
+          Bc = bdiag(Bc, 2*matrix(c(BTTc[i,j],BTEc[i,j],BTEc[i,j], BEEc[i,j]),2,2))
+          dc = c(dc, 2*c(dTc[i,j], dEc[i,j]))
+        }
+
       }
     }
     thetas <- solve(Bc)%*%as.matrix(dc)
@@ -239,7 +245,7 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     }
   }
 
-  Vcov = solve(Bc%*%diag(rep(deriv^2,each = q)))*2
+  Vcov = solve(Bc%*%diag(rep(deriv^2,each = 2)))*2
 
   return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)], VCOV = Vcov))
 }
@@ -311,6 +317,11 @@ for (i in 1:n){
   E_[i,] = results$E.estimates
   VC[[i]] = results$VCOV
 }
+
+colMeans(T_)
+colMeans(E_)
+apply(T_, 2, sd)
+apply(E_, 2, sd)
 
 l = matrix(0,6,6)
 for(i in 1:n){l = l+VC[[i]]}
