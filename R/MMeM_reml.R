@@ -191,28 +191,26 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     dEc=matrix(0,q,q)
     for(i in 1:q){
       for(j in 1:q){
-        BTTc[i,j] = s - ((1/Lambda[i])*Cc_trace[i]+(1/Lambda[j])*Cc_trace[j])+ (1/(Lambda[i]*Lambda[j]))*CcCc_trace[i,j]
-        BTEc[i,j] = 0.5*(Cc_trace[i]+Cc_trace[j]-(1/Lambda[i]+1/Lambda[j])*CcCc_trace[i,j])
-        BEEc[i,j] = Lambda[i]*Lambda[j]*(N-h-s)+CcCc_trace[i,j]
-        dTc[i,j] = t(u_c[[i]])%*%u_c[[j]]
-        dEc[i,j] = Lambda[i]*Lambda[j]*(ycHyc[i,j]-t(u_c[[i]])%*%ZHy_c[[j]]-(1/Lambda[i])*t(u_c[[i]])%*%u_c[[j]])
+        BTTc[i,j] = (1/(Lambda[i]*Lambda[j])) * (s - ((1/Lambda[i])*Cc_trace[i]+(1/Lambda[j])*Cc_trace[j])+ (1/(Lambda[i]*Lambda[j]))*CcCc_trace[i,j])
+        BTEc[i,j] = 0.5*(1/(Lambda[i]*Lambda[j])) *(Cc_trace[i]+Cc_trace[j]-(1/Lambda[i]+1/Lambda[j])*CcCc_trace[i,j])
+        BEEc[i,j] = (N-h-s)+(1/(Lambda[i]*Lambda[j])) * CcCc_trace[i,j]
+        dTc[i,j] = (1/(Lambda[i]*Lambda[j])) * (t(u_c[[i]])%*%u_c[[j]])
+        dEc[i,j] = ycHyc[i,j]-t(u_c[[i]])%*%ZHy_c[[j]]-(1/Lambda[i])*t(u_c[[i]])%*%u_c[[j]]
       }
     }
 
     oldT = T
     oldE = E
 
-    thetas = c()
-    #VaCov = bdiag()
+    Bc = bdiag()
+    dc = c()
     for(i in 1:q){
       for(j in i:q){
-        Bc = matrix(c(BTTc[i,j],BTEc[i,j],BTEc[i,j], BEEc[i,j]),2,2)
-        dc = matrix(c(dTc[i,j], dEc[i,j]),2,1)
-        new_thetas = solve(Bc)%*%dc
-        thetas <- c(thetas, new_thetas)
-        #VaCov = bdiag(VaCov,2*solve(Bc))
+        Bc = bdiag(Bc, matrix(c(BTTc[i,j],BTEc[i,j],BTEc[i,j], BEEc[i,j]),2,2))
+        dc = c(dc, c(dTc[i,j], dEc[i,j]))
       }
     }
+    thetas <- solve(Bc)%*%as.matrix(dc)
 
     T.new = Matrix(0,q,q)
     T.new[upper.tri(T.new,diag=TRUE)] =thetas[odd(1:length(thetas))]
@@ -229,19 +227,60 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     }
   }
 
-  Pc = list()
-  for(i in 1:q){
-    Pc[[i]]= H - H%*%Z%*%Cc[[i]]%*%t(Z)%*%H
+  if(q ==1){
+    Vcov = solve(Bc%x%Q^4)*2
+  }else{
+    Vcov = solve(Bc%*%diag(c(rep(Q[1,1]^4,q),rep((Q[1,1]*Q[2,2]+Q[1,2]*Q[1,1])^2,q), rep(Q[2,2]^4,q))))*2
   }
+  #q = 1
+   #
 
-  P = Q[1,1]*Q[1,1]*Pc[[1]]
+  #q = 2
+  # Pc = list()
+  # for(i in 1:q){
+  #   Pc[[i]]= H - H%*%Z%*%Cc[[i]]%*%t(Z)%*%H
+  # }
+  # P = (t(Q)%x%diag(1,N))%*%bdiag(Pc)%*%(Q%x%diag(1,N))
+  # idx = list(c(1,1), c(1,2),c(2,2))
+  # ZZ = Z%*%t(Z)
+  # PZZ_TT = matrix(0,3,3)
+  # PZZ_TE = matrix(0,3,3)
+  # PZZ_EE = matrix(0,3,3)
+  # a=0
+  # for(i in idx){
+  #   a = a+1
+  #   k = i[1]
+  #   l = i[2]
+  #   D1 = matrix(0,q,q)
+  #   print(c(k, l))
+  #   D1[k,l] = 1
+  #   D1 = forceSymmetric(D1, uplo = 'U')
+  #   PDZZ1 = P%*%(D1 %x% ZZ)
+  #   PDI1= P%*%(D1%x%diag(1,N))
+  #   b=0
+  #   for(j in idx){
+  #     b = b+1
+  #     m = j[1]
+  #     n = j[2]
+  #     print(c(m, n))
+  #     D2 = matrix(0,q,q)
+  #     D2[m,n] = 1
+  #     D2 = forceSymmetric(D2, uplo = 'U')
+  #     PDZZ2 = P%*%(D2 %x% ZZ)
+  #     PDI2 = P%*%(D2%x%diag(1,N))
+  #
+  #     PZZ_TT[a,b] = tr(as.matrix(PDZZ1%*%PDZZ2))
+  #     PZZ_TE[a,b] = tr(as.matrix(PDZZ1%*%PDI2))
+  #     PZZ_EE[a,b] = tr(as.matrix(PDI1%*%PDI2))
+  #   }
+  # }
 
-  ZZ = Z%*%t(Z)
+Info = rbind(cbind(PZZ_TT, PZZ_TE), cbind(PZZ_TE, PZZ_EE))
+solve(Info)*2
 
-  B = matrix(c(tr(P%*%ZZ%*%P%*%ZZ), tr(P%*%ZZ%*%P), tr(P%*%ZZ%*%P), tr(P%*%P)),2,2)
-  solve(B)*2
+#Bc_shuf = rbind(cbind(diag(c(Bc[1,1],Bc[3,3],Bc[5,5])),diag(c(Bc[1,2],Bc[3,4],Bc[5,6]))),cbind(diag(c(Bc[2,1], Bc[4,3], Bc[6,5])), diag(c(Bc[2,2], Bc[4,4], Bc[6,6]))))
 
-  return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)]))
+  return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)])), VCOV = Vcov))
 }
 
 ############## TEST ON BIVARIATE CASE SIMULATION
@@ -323,8 +362,6 @@ I = diag(1, N)
 T.start = 3
 E.start = 4
 q = 1
-
-results = MMeM_reml(T.start, T.start)
 
 
 library(nlme)
