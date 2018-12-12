@@ -1,78 +1,4 @@
-
-
 ##multivariate REML
-library(matrixcalc)
-library(jointDiag)
-
-#check Q
-#Q%*%E%*%t(Q)
-#Q%*%T-diag(gamma)%*%Q%*%E
-
-##Calculating random effect estimates using MME
-
-#data example in paper
-############################
-# z1 = c(rep(1,45))
-# z2 = c(rep(1,37))
-# z3 = c(rep(1,40))
-# z4 = c(rep(1,62))
-# z5 = c(rep(1,46))
-# z6 = c(rep(1,53))
-# z7 = c(rep(1,50))
-# z8 = c(rep(1,45))
-# z9 = c(rep(1,49))
-# z10= c(rep(1,47))
-# z11 = c(rep(1,47))
-# z12 = c(rep(1,53))
-# x1 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),18), 18,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
-# x2 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
-# x3 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),15), 15,3, byrow = TRUE),matrix(rep(c(1,0,0),14), 14,3, byrow = TRUE))
-# x4 = rbind(matrix(rep(c(1,1,0),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,1),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
-# x5 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),17), 17,3, byrow = TRUE))
-# x6 = rbind(matrix(rep(c(1,1,0),25), 25,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),9), 9,3, byrow = TRUE))
-# x7 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),21), 21,3, byrow = TRUE))
-# x8 = rbind(matrix(rep(c(1,1,0),12), 12,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
-# x9 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,0),15), 15,3, byrow = TRUE))
-# x10 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),11), 11,3, byrow = TRUE))
-# x11 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
-# x12 = rbind(matrix(rep(c(1,1,0),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,1),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,0),23), 23,3, byrow = TRUE))
-#
-#
-# y1 = c(62312,83649,61283,51583, 60905,56574, 46245, 69433,63068,98333, 98657, 94499, 58665, 72200, 82572, 129134, 94571,45611,
-#        60732, 71859, 102405, 58989, 57079, 95845, 82909, 81687, 73211, 73757, 86288, 47915, 62817, 56081, 91181, 75513, 62786, 105979)
-# y2 = c(2434, 3084, 2267, 1995, 2169, 2202, 1814, 2519, 2405, 3755, 3871, 3644, 2131, 2630, 2874, 4605, 3372, 1613,
-#        2202, 2624, 3558, 2102, 2129, 3647, 3200, 3043, 2808, 2931, 3234, 1931, 2375, 2438, 3827, 2854, 2573, 3911)
-# #initial E and T
-# T.start = matrix(c(30000,900,900,50),2,2)
-# E.start = matrix(c(360000,6800,6800,600),2,2)
-#
-# ind = cumsum(c(1,14,18,13,11,13,13,11,15,14,21,21,20,13,16,17,25,19,9,13,16,21,12,13,20,17,17,15,17,19,11,14,13,20,16,14,23))
-# N = 574
-# Z = as.matrix(bdiag(z1, z2, z3,z4,z5,z6,z7,z8,z9,z10,z11,z12))
-# I = diag(1, N)
-# X = rbind(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12)
-
-# find_Q <- function(T, E){
-#   Ev= eigen(E)
-#   Evalue =Ev$values
-#   Evec = Ev$vectors
-#   E_neg0.5 = Evec %*%diag(1/sqrt(Evalue))%*%t(Evec)
-#   gamma = eigen(E_neg0.5%*%T%*%E_neg0.5)$values
-#   fn <- function(c){
-#     y <- numeric(q*q)
-#     y[1] <- (T[1,2]-gamma[1]*E[1,2])*c[1]+(T[2,2]-gamma[1]*E[2,2])*c[2]
-#     y[2] <- (T[1,1]-gamma[2]*E[1,1])*c[3]+(T[1,2]-gamma[2]*E[1,2])*c[4]
-#     y[3] <- (E[1,1]*c[1]+E[1,2]*c[2])*c[1]+(E[2,1]*c[1]+E[2,2]*c[2])*c[2]-1
-#     y[4] <- (E[1,1]*c[3]+E[1,2]*c[4])*c[3]+(E[2,1]*c[3]+E[2,2]*c[4])*c[4]-1
-#     return(y)
-#   }
-#   cstart <- c(1,1,1,1)
-#   result <- nleqslv(cstart, fn, control=list(btol=0.001,allowSingular=TRUE))
-#   Q = matrix(result$x,q,q,byrow=TRUE)
-#   return(Q)
-# }
-######################
-
 
 #' finding Q and checking Q
 #'
@@ -97,7 +23,7 @@ find_Q <- function(T,E){
 
   C[,,1] = T
   C[,,2] = E
-  Q_est = jadiag(C)$B
+  Q_est = jointDiag::jadiag(C)$B
   Q_adj = Q_est%*%C[,,2]%*%t(Q_est)
   Q_adj[upper.tri(Q_adj)] = 0
   Q_adj[lower.tri(Q_adj)]= 0
@@ -108,7 +34,7 @@ find_Q <- function(T,E){
 check_Q <- function(Q,T,E){
   QTQ = Q%*%T%*%t(Q)
   QEQ = Q%*%E%*%t(Q)
-  if(is.diagonal.matrix(QTQ) == TRUE & is.diagonal.matrix(QEQ) == TRUE){
+  if(matrixcalc::is.diagonal.matrix(QTQ) == TRUE & matrixcalc::is.diagonal.matrix(QEQ) == TRUE){
     print('----- Q is good -----')
   }else{
     print('----- Q is not good -----')
@@ -120,9 +46,17 @@ odd <- function(x) x%%2 != 0
 even <- function(x) x%%2 == 0
 #####main function of multivariate mixed effects model_REML#####
 
-MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
+MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.000000001){
   T = T.start
   E = E.start
+
+  data_matrix = MMeM_terms(fml ,data, factor_X = factor_X)
+  X = data_matrix$X
+  Y = data_matrix$Y
+  Z = data_matrix$Z
+  N = data_matrix$N
+  I = data_matrix$I
+  q = data_matrix$q
 
   ###ZHZ
   H = I-X%*%ginv(t(X)%*%X)%*%t(X)
@@ -166,9 +100,9 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
     u_c = list()
     for(i in 1:q){
       if(q == 1){
-        y_c[[i]] = Q[i,1]*y1
+        y_c[[i]] = Q[i,1]*Y[,1]
       }else{
-        y_c[[i]] = Q[i,1]*y1+ Q[i,2]*y2
+        y_c[[i]] = Q[i,1]*Y[,1]+ Q[i,2]*Y[,2]
       }
       ZHy_c[[i]] = ZH%*%y_c[[i]]
       u_c[[i]] = Cc[[i]]%*%ZHy_c[[i]]
@@ -244,16 +178,12 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
   }
 
   Vcov = solve(Bc%*%diag(rep(deriv^2,each = 2)))*2
-  rownames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
-  colnames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
+  # rownames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
+  # colnames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
   return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)], VCOV = Vcov))
 }
 
 ############## TEST ON BIVARIATE CASE SIMULATION
-q =2
-s = 12
-p = 3
-
 
 z1 = c(rep(1,45))
 z2 = c(rep(1,37))
@@ -284,19 +214,21 @@ N = 574
 Z = as.matrix(bdiag(z1, z2, z3,z4,z5,z6,z7,z8,z9,z10,z11,z12))
 I = diag(1, N)
 X = rbind(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12)
+each = c(45,37,40,62,46,53,50,45,49,47,47,53)
+Z_vec = c()
+for(i in 1:12){
+  Z_vec = c(Z_vec, rep(i, each[i]))
+}
 
-#Z<-matrix(c(1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1),9,3)
-ZtZ<-Z%*%t(Z)
-#X<-cbind(rep(1,9),rep(c(1,2,3),3))
+X_vec = X[,2]+X[,3]*2
+
 B<-matrix(c(2, 3, 1, 2.5, 3.5, 1.5),3,2)
 T.true<-matrix(c(100,5,5,10),2,2)
 E.true<-matrix(c(60,13,13,40),2,2)
 
-#I<-diag(1,9)
-h = ncol(X)
-s = ncol(Z)
-q = 2
 n = 1000
+s = ncol(Z)
+h = ncol(X)
 
 #initial E and T
 T.start = matrix(c(10,5,5,15),2,2)
@@ -309,9 +241,13 @@ for (i in 1:n){
   U<-mvrnorm(n = s, mu=c(0,0), Sigma=T.true)
   e<-mvrnorm(n = N, mu=c(0,0), Sigma=E.true)
   Y<-X%*%B+Z%*%U+e
-  y1 = Y[,1]
-  y2 = Y[,2]
-  results = MMeM_reml(T.start, T.start)
+
+  data = as.data.frame(cbind(Y, X_vec, Z_vec))
+
+  T.start = matrix(c(10,5,5,15),2,2)
+  E.start = matrix(c(6,1,1,3),2,2)
+  results = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE, T.start, T.start)
+
   T_[i,] = results$T.estimates
   E_[i,] = results$E.estimates
   VC[[i]] = results$VCOV
@@ -333,14 +269,14 @@ sqrt(diag(l/n))
 
 ##### TEST ON UNIVARIATE CASE REAL DATA == UNIVARIATE REML
 
-y1 = as.matrix(getME(mod1, 'y'))
-X = as.matrix(getME(mod1, 'X'))
-Z = as.matrix(getME(mod1, 'Z'))
-N = 246
-I = diag(1, N)
-T.start = 3
-E.start = 4
-q = 1
+# y1 = as.matrix(getME(mod1, 'y'))
+# X = as.matrix(getME(mod1, 'X'))
+# Z = as.matrix(getME(mod1, 'Z'))
+# N = 246
+# I = diag(1, N)
+# T.start = 3
+# E.start = 4
+# q = 1
 
 
 library(nlme)
@@ -349,14 +285,10 @@ library(msm)
 alcohol1 <- read.table("https://stats.idre.ucla.edu/stat/r/examples/alda/data/alcohol1_pp.txt", header=T, sep=",")
 attach(alcohol1)
 model.c <- lme(alcuse ~ coa, data=alcohol1, random= ~ 1 | id)
-mod1<-lmer(alcuse ~ coa +(1|id) ,alcohol1,REML=1)
-intervals(model.c)
-re1 = c(0.5432737, 0.6785808, 0.8475873)
-log(re1)[2] - log(re1)[1]
-log(re1)[3] - log(re1)[2]
+mod1<-lmer(alcuse ~ coa  +(1|id) ,alcohol1,REML=1)
 var <-model.c$apVar
-par<-attr(var, "Pars")
-deltamethod (~ exp(x1)^2, par, var)
 
+results = MMeM_reml(alcuse ~ coa + (1|id), alcohol1, T.start, T.start)
 
+model.matrix( c(alcuse, age_14) ~ coa +(1|id), data=alcohol1)
 
