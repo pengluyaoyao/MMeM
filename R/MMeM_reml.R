@@ -11,7 +11,7 @@
 #' @import jointDiag
 #'
 #' @export
-find_Q <- function(T,E){
+find_Q <- function(T,E, q){
   C = array(NA, dim=c(q,q,2))
 
   #  if(det(T) <= 0){
@@ -44,9 +44,10 @@ check_Q <- function(Q,T,E){
 
 odd <- function(x) x%%2 != 0
 even <- function(x) x%%2 == 0
-#####main function of multivariate mixed effects model_REML#####
+##### Main function of multivariate mixed effects model_REML#####
 
 MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.000000001){
+
   T = T.start
   E = E.start
 
@@ -58,6 +59,15 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
   I = data_matrix$I
   q = data_matrix$q
 
+  if(q >1){
+    if(det(T.start)<=0 | det(E.start)<=0){
+      stop('Initial variance-covariance matrix should be positive definite')
+    }
+    if(isSymmetric(T.start) == FALSE | isSymmetric(E.start) == FALSE){
+      stop('Initial variance-covariance matrix should be symmetric')
+    }
+  }
+
   ###ZHZ
   H = I-X%*%ginv(t(X)%*%X)%*%t(X)
   h = ncol(X)
@@ -66,9 +76,9 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
   ZHZ = t(Z)%*%H%*%Z
 
   for(iter in 1:maxit){
-    print(iter)
+    print(paste('iteration:',iter))
 
-    Q_results = find_Q(T, E)
+    Q_results = find_Q(T, E, q)
     Q = Q_results$Q
 
     Check_Q = check_Q(Q, T, E)
@@ -165,6 +175,10 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
     }
   }
 
+  if(iter == maxit){
+    message('Note: convergence is not reached, results may not be valid.')
+  }
+
   m = 0
   deriv = c()
   for(i in 1:q){
@@ -178,117 +192,25 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
   }
 
   Vcov = solve(Bc%*%diag(rep(deriv^2,each = 2)))*2
-  # rownames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
-  # colnames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
+
+  Tnames = c()
+  Enames = c()
+  for(i in 1:q){
+    for(j in i:q){
+      Y_names = paste(colnames(data)[i:j], collapse = " ")
+      Tnames = c(Tnames, paste('T:', Y_names))
+      Enames = c(Enames, paste('E:', Y_names))
+    }
+  }
+  w = q*(q+1)
+  names = double(w)
+  names[odd(1:w)] = Tnames
+  names[even(1:w)] = Enames
+  rownames(Vcov) = names
+  colnames(Vcov) = names
+
   return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)], VCOV = Vcov))
 }
 
-############## TEST ON BIVARIATE CASE SIMULATION
 
-z1 = c(rep(1,45))
-z2 = c(rep(1,37))
-z3 = c(rep(1,40))
-z4 = c(rep(1,62))
-z5 = c(rep(1,46))
-z6 = c(rep(1,53))
-z7 = c(rep(1,50))
-z8 = c(rep(1,45))
-z9 = c(rep(1,49))
-z10= c(rep(1,47))
-z11 = c(rep(1,47))
-z12 = c(rep(1,53))
-x1 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),18), 18,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
-x2 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
-x3 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),15), 15,3, byrow = TRUE),matrix(rep(c(1,0,0),14), 14,3, byrow = TRUE))
-x4 = rbind(matrix(rep(c(1,1,0),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,1),21), 21,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
-x5 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),17), 17,3, byrow = TRUE))
-x6 = rbind(matrix(rep(c(1,1,0),25), 25,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),9), 9,3, byrow = TRUE))
-x7 = rbind(matrix(rep(c(1,1,0),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,1),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,0),21), 21,3, byrow = TRUE))
-x8 = rbind(matrix(rep(c(1,1,0),12), 12,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
-x9 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,0),15), 15,3, byrow = TRUE))
-x10 = rbind(matrix(rep(c(1,1,0),17), 17,3, byrow = TRUE),matrix(rep(c(1,0,1),19), 19,3, byrow = TRUE),matrix(rep(c(1,0,0),11), 11,3, byrow = TRUE))
-x11 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3, byrow = TRUE),matrix(rep(c(1,0,0),20), 20,3, byrow = TRUE))
-x12 = rbind(matrix(rep(c(1,1,0),16), 16,3, byrow = TRUE),matrix(rep(c(1,0,1),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,0),23), 23,3, byrow = TRUE))
-#ind = cumsum(c(1,14,18,13,11,13,13,11,15,14,21,21,20,13,16,17,25,19,9,13,16,21,12,13,20,17,17,15,17,19,11,14,13,20,16,14,23))
-N = 574
-Z = as.matrix(bdiag(z1, z2, z3,z4,z5,z6,z7,z8,z9,z10,z11,z12))
-I = diag(1, N)
-X = rbind(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12)
-each = c(45,37,40,62,46,53,50,45,49,47,47,53)
-Z_vec = c()
-for(i in 1:12){
-  Z_vec = c(Z_vec, rep(i, each[i]))
-}
-
-X_vec = X[,2]+X[,3]*2
-
-B<-matrix(c(2, 3, 1, 2.5, 3.5, 1.5),3,2)
-T.true<-matrix(c(100,5,5,10),2,2)
-E.true<-matrix(c(60,13,13,40),2,2)
-
-n = 1000
-s = ncol(Z)
-h = ncol(X)
-
-#initial E and T
-T.start = matrix(c(10,5,5,15),2,2)
-E.start = matrix(c(6,1,1,3),2,2)
-
-T_ = matrix(0, n,3)
-E_ = matrix(0, n,3)
-VC = list()
-for (i in 1:n){
-  U<-mvrnorm(n = s, mu=c(0,0), Sigma=T.true)
-  e<-mvrnorm(n = N, mu=c(0,0), Sigma=E.true)
-  Y<-X%*%B+Z%*%U+e
-
-  data = as.data.frame(cbind(Y, X_vec, Z_vec))
-
-  T.start = matrix(c(10,5,5,15),2,2)
-  E.start = matrix(c(6,1,1,3),2,2)
-  results = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE, T.start, T.start)
-
-  T_[i,] = results$T.estimates
-  E_[i,] = results$E.estimates
-  VC[[i]] = results$VCOV
-}
-
-colMeans(T_)
-colMeans(E_)
-apply(T_, 2, sd)
-apply(E_, 2, sd)
-
-l = matrix(0,6,6)
-for(i in 1:n){l = l+VC[[i]]}
-sqrt(diag(l/n))
-
-
-# Q <- matrix(c(0.001608,0.000975,-0.039382,0.023869),2,2)
-# Q%*%E%*%t(Q)
-# Q%*%T%*%t(Q)
-
-##### TEST ON UNIVARIATE CASE REAL DATA == UNIVARIATE REML
-
-# y1 = as.matrix(getME(mod1, 'y'))
-# X = as.matrix(getME(mod1, 'X'))
-# Z = as.matrix(getME(mod1, 'Z'))
-# N = 246
-# I = diag(1, N)
-# T.start = 3
-# E.start = 4
-# q = 1
-
-
-library(nlme)
-library(lme4)
-library(msm)
-alcohol1 <- read.table("https://stats.idre.ucla.edu/stat/r/examples/alda/data/alcohol1_pp.txt", header=T, sep=",")
-attach(alcohol1)
-model.c <- lme(alcuse ~ coa, data=alcohol1, random= ~ 1 | id)
-mod1<-lmer(alcuse ~ coa  +(1|id) ,alcohol1,REML=1)
-var <-model.c$apVar
-
-results = MMeM_reml(alcuse ~ coa + (1|id), alcohol1, T.start, T.start)
-
-model.matrix( c(alcuse, age_14) ~ coa +(1|id), data=alcohol1)
 
