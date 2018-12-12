@@ -1,8 +1,6 @@
 
 
 ##multivariate REML
-library(matlib)
-library(nleqslv)
 library(matrixcalc)
 library(jointDiag)
 
@@ -246,7 +244,8 @@ MMeM_reml <- function(T.start, E.start, maxit=50, tol = 0.000000001){
   }
 
   Vcov = solve(Bc%*%diag(rep(deriv^2,each = 2)))*2
-
+  rownames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
+  colnames(Vcov) = c('T:y1&y1', 'E: y1&y1', 'T:y1&y2','E:y1&y2', 'T:y2&y2', 'E:y2&y2')
   return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)], VCOV = Vcov))
 }
 
