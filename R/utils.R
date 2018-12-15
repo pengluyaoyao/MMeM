@@ -14,9 +14,11 @@ MMeM_terms <- function(fml, data, factor_X){
     if(length(DVs) == 3){
       message(paste('Bivariate response:', DVs[2], 'and', DVs[3]))
       Y = as.matrix(df[,match(DVs[2:length(DVs)], colnames(df))])
+      DV = c(DVs[2], DVs[3])
     }else if(length(DVs) == 1){
       message(paste('Univariate response:', DVs[1:length(DVs)]))
       Y = as.matrix(df[,match(DVs[1:length(DVs)], colnames(df))])
+      DV = DVs[1]
     }else{
       stop('Dependent variables should be univariate or bivariate.')
     }
@@ -40,7 +42,7 @@ MMeM_terms <- function(fml, data, factor_X){
     q = ncol(as.matrix(Y))
   }
 
-  return(list(X = X, Z = Z, Y = Y, N =N, I =I, q=q))
+  return(list(X = X, Z = Z, Y = Y, N =N, I =I, q=q, DV = DV))
 }
 
 

@@ -109,6 +109,7 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
   N = data_matrix$N
   I = data_matrix$I
   q = data_matrix$q
+  DV = data_matrix$DV
 
   if(q >1){
     if(det(T.start)<=0 | det(E.start)<=0){
@@ -242,13 +243,13 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
     }
   }
 
-  Vcov = solve(Bc%*%diag(rep(deriv^2,each = 2)))*2
+  Vcov = Matrix(solve(Bc%*%diag(rep(deriv^2,each = 2)))*2, sparse = TRUE)
 
   Tnames = c()
   Enames = c()
   for(i in 1:q){
     for(j in i:q){
-      Y_names = paste(colnames(data)[i:j], collapse = " ")
+      Y_names = paste(DV[i:j], collapse = " ")
       Tnames = c(Tnames, paste('T:', Y_names))
       Enames = c(Enames, paste('E:', Y_names))
     }
