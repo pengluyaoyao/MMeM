@@ -1,12 +1,6 @@
-library(MASS)
-library(Matrix)
-library(psych)
-
-
 ###HendersonIII
 
 MMeM_henderson3 <- function(fml, data, factor_X){
-
 
   data_matrix = MMeM_terms(fml ,data, factor_X = factor_X)
   X = data_matrix$X
@@ -28,16 +22,18 @@ MMeM_henderson3 <- function(fml, data, factor_X){
 
   E_aov<-(t(Y)%*%C_E%*%Y)/psych::tr(C_E)
   cov_E = (2/psych::tr(C_E))*(E_aov%x%E_aov)
-  v_E<- unique(diag(cov_E))
-  E.estimate = rbind(E_aov[upper.tri(E_aov,diag=TRUE)], v_E)
+  E.variance<- unique(diag(cov_E))
+  E.estimates = E_aov[upper.tri(E_aov,diag=TRUE)]
+  E_results = rbind(E.estimates, E.variance)
 
   T_aov = (t(Y)%*%C_T%*%Y)/psych::tr(Z%*%t(Z)%*%(I-HX))
   D_aov = (t(Y)%*%C_D%*%Y)
   cov_D = (2/psych::tr(C_D))*(D_aov%x%D_aov)
 
-  cov_T<- (cov_D - cov_E*(psych::tr(C_D))^2)/(psych::tr(Z%*%t(Z)%*%(I-HX)))^2
-  v_T = unique(diag(cov_T))
-  T.estimate = rbind(T_aov[upper.tri(T_aov,diag=TRUE)], v_T)
+  cov_T<- (cov_D + cov_E*(psych::tr(C_D))^2)/(psych::tr(Z%*%t(Z)%*%(I-HX)))^2
+  T.variance = unique(diag(cov_T))
+  T.estimates = T_aov[upper.tri(T_aov,diag=TRUE)]
+  T_results = rbind(T.estimates, T.variance)
 
   Tnames = c()
   Enames = c()
@@ -48,12 +44,9 @@ MMeM_henderson3 <- function(fml, data, factor_X){
       Enames = c(Enames, paste('E:', Y_names))
     }
   }
-  w = q*(q+1)
-  names = double(w)
-  names[odd(1:w)] = Tnames
-  names[even(1:w)] = Enames
-  rownames(Vcov) = names
-  colnames(Vcov) = names
 
-  return(list(T.estimate = , E.estimate = E_aov[upper.tri(E_aov,diag=TRUE)], VCOV = Vcov))
+  colnames(T_results) = Tnames
+  colnames(E_results) = Enames
+
+  return(list(T.estimates = T_results, E.estimates = E_results))
 }
