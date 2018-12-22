@@ -1,1 +1,0 @@
-square <- function(a){a^2}
