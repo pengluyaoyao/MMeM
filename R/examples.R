@@ -58,7 +58,7 @@
 #   Y<-X%*%B+Z%*%U+e
 #
 #   data = as.data.frame(cbind(Y, X_vec, Z_vec))
-#
+
 #   T.start = matrix(c(10,5,5,15),2,2)
 #   E.start = matrix(c(10,1,1,3),2,2)
 #   results = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE, T.start, E.start, maxit = 10)
@@ -95,5 +95,5 @@
 # T.start = 3
 # E.start = 4
 # results = MMeM_reml(alcuse ~ age + (1|id), alcohol1, factor_X = FALSE, T.start, E.start)
-
-
+#
+# MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE)

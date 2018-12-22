@@ -1,15 +1,24 @@
-
+#' parses formulas to creates model matrices
+#' @param fml a two-sided linear formula object describing both the fixed-effects and random-effects  parts  of  the  model,
+#'  with  the  response  on  the  left  of  a ~ operator. For univariate response, put variable name directly; for multivariate responses
+#'  combine variables using concatenate operator, for example, for bivariate responses, c(var1, var2).  The predictor terms are separated  by + operators,  on  the  right.   Random-effects  terms  are
+#' distinguished by vertical bars '|' separating expressions for design matrices from grouping factors.
+#' @param data data frame containing the variables named in formula.
+#' @param factor_X (logical) indicating whether predictor is a factor or continuous. By default is TRUE
+#' @importFrom lme4 findbars
+#' @importFrom stringr str_extract_all
+#' @export
 MMeM_terms <- function(fml, data, factor_X){
 
-  Fml = formula(fml)
+  Fml = stats::formula(fml)
   any_RE <- length( lme4::findbars(Fml))
 
   if(any_RE == 0){
     stop('No random effects in the model')
   } else{
-    df = get_all_vars(Fml, data)
+    df = stats::get_all_vars(Fml, data)
 
-    terms = attr(terms.formula(Fml), 'variables')
+    terms = attr(stats::terms.formula(Fml), 'variables')
     DVs = all.names(terms[2])
     if(length(DVs) == 3){
       message(paste('Bivariate response:', DVs[2], 'and', DVs[3]))
@@ -23,17 +32,17 @@ MMeM_terms <- function(fml, data, factor_X){
       stop('Dependent variables should be univariate or bivariate.')
     }
 
-    re_term = str_extract_all(format(terms[length(terms)]), "(?<=\\|).+?(?=\\))")[[1]]
+    re_term = stringr::str_extract_all(format(terms[length(terms)]), "(?<=\\|).+?(?=\\))")[[1]]
     re_strip = gsub(" ", "", re_term, fixed = TRUE)
     re_data = df[,match(re_strip, colnames(df))]
-    Z = model.matrix(~ -1 + factor(re_data))
+    Z = stats::model.matrix(~ -1 + factor(re_data))
 
     IV = all.names(terms[-c(1,2,length(terms))])
     IV_data = df[,match(IV, colnames(df))]
     if(factor_X == TRUE){
-      X = model.matrix(~ factor(IV_data))
+      X = stats::model.matrix(~ factor(IV_data))
     }else{
-      X = model.matrix(~ IV_data)
+      X = stats::model.matrix(~ IV_data)
     }
 
 

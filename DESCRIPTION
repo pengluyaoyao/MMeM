@@ -1,12 +1,26 @@
 Package: MMeM
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Multivariate Mixed Effects Model
+Version: 0.0.1.0
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(person(given = "Luyao",
+           family = "Peng",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "luyaopeng.cn@gmail.com"),
+        person(given = "Rui",
+           family = "Yang",
+           role = c("aut"),
+           email = "rkzyang@gmail.com"))
+Maintainer: Luyao Peng <luyaopeng.cn@gmail.com>
+Description: Analyzing data under multivariate mixed effects model using multivariate REML and multivariate Henderson3 methods.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.1.0
+Imports: stats,
+         MASS,
+         Matrix,
+         jointDiag,
+         lme4,
+         matrixcalc,
+         psych,
+         stringr
