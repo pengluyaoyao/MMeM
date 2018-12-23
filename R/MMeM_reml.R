@@ -182,12 +182,7 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
       }
     }
 
-    if(matrixcalc::is.singular.matrix(Bc) == FALSE){
-      thetas <- solve(Bc)%*%as.matrix(dc)
-    }else{
-      stop('Information matrix is singular. Please add more levels of the random effects')
-    }
-
+    thetas <- solve(Bc)%*%as.matrix(dc)
 
     T.new = matrix(0,q,q)
     T.new[upper.tri(T.new,diag=TRUE)] =thetas[odd(1:length(thetas))]
