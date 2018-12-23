@@ -7,6 +7,13 @@
 #' distinguished by vertical bars '|' separating expressions for design matrices from grouping factors.
 #' @param data data frame containing the variables named in formula.
 #' @param factor_X (logical) indicating whether predictor is a factor or continuous. By default is TRUE
+#' @examples
+#' \dontrun{
+#' data = read.csv('/Users/pengluyao/Documents/R_Package_Dvlp/MMeM/data/simulated_data.csv')
+#' T.start = matrix(c(10,5,5,15),2,2)
+#' E.start = matrix(c(10,1,1,3),2,2)
+#' results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE)
+#' }
 #' @return \code{T.estimates} is he estimated matrix of the variance covariance matrix of the block random effects with corresponding standard errors;
 #' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals with corresponding standard errors;
 #' @examples
