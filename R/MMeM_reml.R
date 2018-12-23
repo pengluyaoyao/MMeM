@@ -14,10 +14,10 @@
 #' @param tol the convergence tolerance
 #' @details
 #' The model supports multivariate mixed effects model for one-way randomized block design with equal design matrices:
-#' \deqn{Y = \left(I_q x X\right)B + \left(I_q x Z \right)U + E}
+#' \deqn{Y = (I_q \%x\% X )B + (I_q \%x\% Z )U + E}
 #'
 #' The model also supports simple OLS multivariate regression:
-#' \deqn{y = Xb + Zu+ e}
+#' \deqn{y = Xb + Zu + e}
 #' @return the output \code{T.estimates} is he estimated matrix of the variance covariance matrix of the block random effects;
 #' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals; \code{VCOV} is the asymptotic
 #' dispersion matrix of the estimated variance covariance components.
