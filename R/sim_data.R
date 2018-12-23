@@ -6,7 +6,7 @@
 #' and one random effects
 #'
 #' @docType data
-#'
+#' @name mydata
 #' @usage data(mydata)
 #'
 #'
