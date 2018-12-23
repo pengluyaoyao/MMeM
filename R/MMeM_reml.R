@@ -23,10 +23,10 @@
 #' dispersion matrix of the estimated variance covariance components.
 #' @examples
 #' \dontrun{
-#' Data = data(simdata)
+#' data(simdata)
 #' T.start = matrix(c(10,5,5,15),2,2)
 #' E.start = matrix(c(10,1,1,3),2,2)
-#' results_reml = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), Data,
+#' results_reml = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), simdata,
 #' factor_X = TRUE, T.start, E.start, maxit = 10)
 #' }
 #'

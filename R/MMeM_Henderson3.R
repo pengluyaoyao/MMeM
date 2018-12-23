@@ -9,10 +9,10 @@
 #' @param factor_X (logical) indicating whether predictor is a factor or continuous. By default is TRUE
 #' @examples
 #' \dontrun{
-#' Data = data(simdata)
+#' data(simdata)
 #' T.start = matrix(c(10,5,5,15),2,2)
 #' E.start = matrix(c(10,1,1,3),2,2)
-#' results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), Data, factor_X = TRUE)
+#' results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), simdata, factor_X = TRUE)
 #' }
 #' @return \code{T.estimates} is he estimated matrix of the variance covariance matrix of the block random effects with corresponding standard errors;
 #' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals with corresponding standard errors;
