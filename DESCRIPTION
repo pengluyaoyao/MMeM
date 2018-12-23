@@ -1,6 +1,8 @@
 Package: MMeM
 Title: Multivariate Mixed Effects Model
 Version: 0.1.0
+Depends:
+  R (>= 3.3.0)
 Authors@R: 
     c(person(given = "Luyao",
            family = "Peng",
