@@ -59,7 +59,6 @@
 #' @references Meyer, K. A. R. I. N. "Maximum likelihood estimation of variance components for a multivariate mixed model with equal design matrices." Biometrics 1985: 153-165.
 #'
 #' @importFrom matrixcalc is.diagonal.matrix
-#' @importFrom matrixcalc is.singular.matrix
 #' @importFrom jointDiag jadiag
 #' @importFrom psych tr
 #' @importFrom Matrix bdiag
