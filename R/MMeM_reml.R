@@ -28,17 +28,6 @@
 #' E.start = matrix(c(10,1,1,3),2,2)
 #' results_reml = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE, T.start, E.start, maxit = 10)
 #' }
-#' X_vec = X[,2]+X[,3]*2
-#' U<-mvrnorm(n = s, mu=c(0,0), Sigma=T.true)
-#' e<-mvrnorm(n = N, mu=c(0,0), Sigma=E.true)
-#' Y<-X%*%B+Z%*%U+e
-#'
-#' T.start = matrix(c(10,5,5,15),2,2)
-#' E.start = matrix(c(6,1,1,3),2,2)
-#' data = as.data.frame(cbind(Y, X_vec, Z_vec))
-#' results = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data,
-#' factor_X = TRUE, T.start, E.start, maxit = 10)
-#' }
 #'
 #' @references Meyer, K. A. R. I. N. "Maximum likelihood estimation of variance components for a multivariate mixed model with equal design matrices." Biometrics 1985: 153-165.
 #'
