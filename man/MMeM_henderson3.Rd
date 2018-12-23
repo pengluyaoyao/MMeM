@@ -25,10 +25,10 @@ Multivariate Henderson3 method
 }
 \examples{
 \dontrun{
-data = read.csv('/Users/pengluyao/Documents/R_Package_Dvlp/MMeM/data/simulated_data.csv')
+Data = data(mydata)
 T.start = matrix(c(10,5,5,15),2,2)
 E.start = matrix(c(10,1,1,3),2,2)
-results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE)
+results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), Data, factor_X = TRUE)
 }
 \dontrun{z1 = c(rep(1,45))
 z2 = c(rep(1,37))

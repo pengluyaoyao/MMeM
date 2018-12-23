@@ -42,10 +42,11 @@ The model also supports simple OLS multivariate regression:
 }
 \examples{
 \dontrun{
-data = read.csv('/Users/pengluyao/Documents/R_Package_Dvlp/MMeM/data/simulated_data.csv')
+Data = data(mydata)
 T.start = matrix(c(10,5,5,15),2,2)
 E.start = matrix(c(10,1,1,3),2,2)
-results_reml = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE, T.start, E.start, maxit = 10)
+results_reml = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), Data,
+factor_X = TRUE, T.start, E.start, maxit = 10)
 }
 
 }

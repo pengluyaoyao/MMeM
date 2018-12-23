@@ -38,9 +38,7 @@
 #' @importFrom Matrix bdiag
 #' @importFrom Matrix Matrix
 #' @export
-
 ##### Main function of multivariate mixed effects model_REML#####
-
 MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.000000001){
 
   T = T.start
