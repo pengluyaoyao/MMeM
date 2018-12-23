@@ -28,7 +28,7 @@ Multivariate Henderson3 method
 data(simdata)
 T.start = matrix(c(10,5,5,15),2,2)
 E.start = matrix(c(10,1,1,3),2,2)
-results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), simdata, factor_X = TRUE)
+results_henderson = MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec), data = simdata, factor_X = TRUE)
 }
 \dontrun{z1 = c(rep(1,45))
 z2 = c(rep(1,37))
