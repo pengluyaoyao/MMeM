@@ -41,38 +41,11 @@ The model also supports simple OLS multivariate regression:
 \deqn{y = Xb + Zu+ e}
 }
 \examples{
-\dontrun{# simulating data
-z1 = c(rep(1,45))
-z2 = c(rep(1,37))
-z3 = c(rep(1,40))
-x1 = rbind(matrix(rep(c(1,1,0),14), 14,3, byrow = TRUE),matrix(rep(c(1,0,1),18), 18,3,
-byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
-x2 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),13), 13,3,
-byrow = TRUE),matrix(rep(c(1,0,0),13), 13,3, byrow = TRUE))
-x3 = rbind(matrix(rep(c(1,1,0),11), 11,3, byrow = TRUE),matrix(rep(c(1,0,1),15), 15,3,
-byrow = TRUE),matrix(rep(c(1,0,0),14), 14,3, byrow = TRUE))
-Z = as.matrix(bdiag(z1, z2, z3))
-X = rbind(x1,x2,x3)
-B<-matrix(c(2, 3, 1, 2.5, 3.5, 1.5),3,2)
-T.true<-matrix(c(100,5,5,10),2,2)
-E.true<-matrix(c(60,13,13,40),2,2)
-s = ncol(Z)
-h = ncol(X)
-each = c(45,37,40)
-Z_vec = c()
-for(i in 1:3){
-  Z_vec = c(Z_vec, rep(i, each[i]))
-}
-X_vec = X[,2]+X[,3]*2
-U<-mvrnorm(n = s, mu=c(0,0), Sigma=T.true)
-e<-mvrnorm(n = N, mu=c(0,0), Sigma=E.true)
-Y<-X\%*\%B+Z\%*\%U+e
-
+\dontrun{
+data = read.csv('/Users/pengluyao/Documents/R_Package_Dvlp/MMeM/data/simulated_data.csv')
 T.start = matrix(c(10,5,5,15),2,2)
-E.start = matrix(c(6,1,1,3),2,2)
-data = as.data.frame(cbind(Y, X_vec, Z_vec))
-results = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data,
-factor_X = TRUE, T.start, E.start, maxit = 10)
+E.start = matrix(c(10,1,1,3),2,2)
+results_reml = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE, T.start, E.start, maxit = 10)
 }
 
 }
