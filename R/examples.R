@@ -61,7 +61,7 @@
 # results_reml = MMeM_reml(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE, T.start, E.start, maxit = 10)
 # results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), data, factor_X = TRUE)
 
-#save(data, file="/Users/pengluyao/Documents/R_Package_Dvlp/MMeM/data/mydata.RData")
+#save(data, file="/Users/pengluyao/Documents/R_Package_Dvlp/MMeM/data/mydata.rda")
 # # ##### TEST ON UNIVARIATE CASE REAL DATA == UNIVARIATE REML
 #
 # alcohol1 <- read.table("https://stats.idre.ucla.edu/stat/r/examples/alda/data/alcohol1_pp.txt", header=T, sep=",")

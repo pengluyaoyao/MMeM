@@ -7,7 +7,7 @@
 #' @name MMeM
 "_PACKAGE"
 
-
+#' simulated datasets
 #' @title
 #' simulated bivariate data
 #'
@@ -16,8 +16,8 @@
 #' and one random effects
 #'
 #' @docType data
-#' @name mydata
-#' @usage data(mydata)
+#' @name simdata
+#' @usage data(simdata)
 #'
 #'
 #' @keywords datasets

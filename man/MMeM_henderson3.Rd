@@ -25,7 +25,7 @@ Multivariate Henderson3 method
 }
 \examples{
 \dontrun{
-Data = data(mydata)
+Data = data(simdata)
 T.start = matrix(c(10,5,5,15),2,2)
 E.start = matrix(c(10,1,1,3),2,2)
 results_henderson = MMeM_henderson3(c(V1,V2) ~ X_vec + (1|Z_vec), Data, factor_X = TRUE)
