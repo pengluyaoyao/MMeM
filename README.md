@@ -27,7 +27,9 @@ alcohol1 <- read.table("https://stats.idre.ucla.edu/stat/r/examples/alda/data/al
 attach(alcohol1)
 mod1<-lme4::lmer(alcuse ~ age  +(1|id) ,alcohol1,REML=1)
 summary(mod1)
-stats::vcov(mod1, full =TRUE)
+
+library(merDeriv)
+vcov(mod1, full =TRUE)
 # # var <-model.c$apVar
 #
 T.start = 3
