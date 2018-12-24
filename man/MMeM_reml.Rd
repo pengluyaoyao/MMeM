@@ -26,7 +26,7 @@ distinguished by vertical bars '|' separating expressions for design matrices fr
 \item{tol}{the convergence tolerance}
 }
 \value{
-the output \code{T.estimates} is he estimated matrix of the variance covariance matrix of the block random effects;
+the output \code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects;
 \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals; \code{VCOV} is the asymptotic
 dispersion matrix of the estimated variance covariance components.
 }
