@@ -38,6 +38,7 @@
 #' @importFrom psych tr
 #' @importFrom Matrix bdiag
 #' @importFrom Matrix Matrix
+#' @importFrom stringr str_extract_all
 #' @export
 ##### Main function of multivariate mixed effects model_REML#####
 MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.000000001){
@@ -258,7 +259,7 @@ MMeM_terms <- function(fml, data, factor_X){
       stop('Dependent variables should be univariate or bivariate.')
     }
 
-    re_term = str_extract_all(format(terms[length(terms)]), "(?<=\\|).+?(?=\\))")[[1]]
+    re_term = stringr::str_extract_all(format(terms[length(terms)]), "(?<=\\|).+?(?=\\))")[[1]]
     re_strip = gsub(" ", "", re_term, fixed = TRUE)
     re_data = df[,match(re_strip, colnames(df))]
     Z = model.matrix(~ -1 + factor(re_data))
