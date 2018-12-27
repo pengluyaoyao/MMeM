@@ -20,6 +20,7 @@
 #'
 #' @references Wesolowska‐Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665-674.
 #' @importFrom psych tr
+#' @importFrom stringr str_extract_all
 #' @export
 MMeM_henderson3 <- function(fml, data, factor_X){
   data_matrix = MMeM_terms(fml ,data, factor_X = factor_X)
