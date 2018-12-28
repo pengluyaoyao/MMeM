@@ -35,8 +35,8 @@ Estimating the variance components under the multivariate mixed effects model us
 }
 \details{
 The model supports multivariate mixed effects model for one-way randomized block design with equal design matrices:
-\deqn{Y = (I_q * X )B + (I_q * Z )U + E}
-where '*' indicate the kronecker product.
+\deqn{Y = (I x X)B + (I x Z)U + E}
+where 'x' indicate the kronecker product.
 
 The model also supports simple OLS multivariate regression:
 \deqn{y = Xb + Zu + e}
