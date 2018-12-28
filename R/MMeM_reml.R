@@ -34,6 +34,7 @@
 #' @references Meyer, K. A. R. I. N. "Maximum likelihood estimation of variance components for a multivariate mixed model with equal design matrices." Biometrics 1985: 153-165.
 #'
 #' @importFrom matrixcalc is.diagonal.matrix
+#' @importFrom matrixcalc is.singular.matrix
 #' @importFrom jointDiag jadiag
 #' @importFrom psych tr
 #' @importFrom Matrix bdiag
@@ -155,8 +156,12 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
       }
     }
 
+    if(matrixcalc::is.singular.matrix(Bc)){
+      stop('Information matrix is not invertible')
+    }else{
+      thetas <- solve(Bc)%*%as.matrix(dc)
+    }
 
-    thetas <- solve(Bc)%*%as.matrix(dc)
 
     T.new = matrix(0,q,q)
     T.new[upper.tri(T.new,diag=TRUE)] =thetas[odd(1:length(thetas))]
