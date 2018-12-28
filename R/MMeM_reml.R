@@ -157,7 +157,7 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
     }
 
     if(matrixcalc::is.singular.matrix(as.matrix(Bc))){
-      stop('Information matrix is not invertible')
+      stop('Information matrix is not invertible, please increase the levels of the rando effects')
     }else{
       thetas <- solve(Bc)%*%as.matrix(dc)
     }
