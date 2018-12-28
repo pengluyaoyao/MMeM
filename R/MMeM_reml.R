@@ -156,7 +156,7 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
       }
     }
 
-    if(matrixcalc::is.singular.matrix(Bc)){
+    if(matrixcalc::is.singular.matrix(as.matrix(Bc))){
       stop('Information matrix is not invertible')
     }else{
       thetas <- solve(Bc)%*%as.matrix(dc)
