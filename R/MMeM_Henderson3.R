@@ -10,8 +10,8 @@
 #' @examples
 #' \dontrun{
 #' data(simdata)
-#' results_henderson = MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec),
-#' data = simdata, factor_X = TRUE)
+#' \eqn{results_henderson = MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec),
+#' data = simdata, factor_X = TRUE)}
 #' }
 #' @return \code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects with corresponding standard errors;
 #' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals with corresponding standard errors;
