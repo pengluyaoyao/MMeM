@@ -38,12 +38,17 @@ Suppose n observational units, q variates, p fixed effects coefficients and s ra
 The model supports multivariate mixed effects model for one-way randomized block design with equal design matrices:
 \deqn{Y = XB + ZU + E}
 where Y is n by q reponse matrix;
-B is p by q coefficients matrix for the fixed effects, B is p by q coefficients matrix for the fixed effects;
+X is n by p design matrix for the fixed effects;
+B is p by q coefficients matrix for the fixed effects;
+Z is n by s design matrix for the random effects;
 U is s by q matrix for the random effects;
 E is n by q random errors matrix.
 
 The model also supports simple OLS multivariate regression:
 \deqn{y = Xb + Zu + e}
+where y is n by 1 response vector;
+b is p by 1 coefficients vector for the fixed effects;
+u is s by 1 matrix for the random effects.
 }
 \examples{
 \dontrun{
