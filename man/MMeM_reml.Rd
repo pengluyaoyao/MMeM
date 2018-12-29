@@ -50,16 +50,6 @@ where y is n by 1 response vector;
 b is p by 1 coefficients vector for the fixed effects;
 u is s by 1 matrix for the random effects.
 }
-\examples{
-\dontrun{
-data(simdata)
-T.start = matrix(c(10,5,5,15),2,2)
-E.start = matrix(c(10,1,1,3),2,2)
-\\eqn{results_reml = MMeM_reml(fml = c(V1,V2) ~ X_vec + (1|Z_vec), data = simdata,
-factor_X = TRUE, T.start = T.start, E.start = E.start, maxit = 10)}
-}
-
-}
 \references{
 Meyer, K. A. R. I. N. "Maximum likelihood estimation of variance components for a multivariate mixed model with equal design matrices." Biometrics 1985: 153-165.
 }

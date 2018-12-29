@@ -26,8 +26,8 @@ Multivariate Henderson3 method
 \examples{
 \dontrun{
 data(simdata)
-\\eqn{results_henderson = MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec),
-data = simdata, factor_X = TRUE)}
+results_henderson <- MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec),
+data = simdata, factor_X = TRUE)
 }
 }
 \references{
