@@ -13,9 +13,13 @@
 #' @param maxit the maximum number of iterations
 #' @param tol the convergence tolerance
 #' @details
+#' Suppose n observational units, q variates, p fixed effects coefficients and s random effects units.
 #' The model supports multivariate mixed effects model for one-way randomized block design with equal design matrices:
-#' \deqn{Y = (I x X)B + (I x Z)U + E}
-#' where 'x' indicate the kronecker product.
+#' \deqn{Y = XB + ZU + E}
+#' where Y is n by q reponse matrix;
+#' B is p by q coefficients matrix for the fixed effects, B is p by q coefficients matrix for the fixed effects;
+#' U is s by q matrix for the random effects;
+#' E is n by q random errors matrix.
 #'
 #' The model also supports simple OLS multivariate regression:
 #' \deqn{y = Xb + Zu + e}
