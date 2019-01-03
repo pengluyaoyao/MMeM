@@ -38,7 +38,11 @@ MMeM_terms <- function(fml, data, factor_X){
     Z = stats::model.matrix(~ -1 + factor(re_data))
 
     IV = all.names(terms[-c(1,2,length(terms))])
-    IV_data = df[,match(IV, colnames(df))]
+    if(length(IV) != 1){
+      stop('Now only support one predictor in the model')
+    }else{
+      IV_data = df[,match(IV, colnames(df))]
+    }
     if(factor_X == TRUE){
       X = stats::model.matrix(~ factor(IV_data))
     }else{
@@ -53,6 +57,7 @@ MMeM_terms <- function(fml, data, factor_X){
 
   return(list(X = X, Z = Z, Y = Y, N =N, I =I, q=q, DV = DV))
 }
+
 
 
 #d = MMeM_terms(c(age,male) ~ male+(1|id), data=alcohol1)
