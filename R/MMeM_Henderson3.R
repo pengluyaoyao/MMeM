@@ -98,7 +98,7 @@ MMeM_terms <- function(fml, data, factor_X){
     Z = model.matrix(~ -1 + factor(re_data))
 
     IV = all.names(terms[-c(1,2,length(terms))])
-    if(len(IV) != 1){
+    if(length(IV) != 1){
       stop('Now only support one predictor in the model')
     }else{
       IV_data = df[,match(IV, colnames(df))]
