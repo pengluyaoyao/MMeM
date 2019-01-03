@@ -72,24 +72,22 @@ MMeM_henderson3 <- function(fml, data, factor_X){
 ##utility functions
 MMeM_terms <- function(fml, data, factor_X){
 
-  Fml = stats::formula(fml)
+  Fml = formula(fml)
   any_RE <- length( lme4::findbars(Fml))
 
   if(any_RE == 0){
     stop('No random effects in the model')
   } else{
-    df = stats::get_all_vars(Fml, data)
+    df = get_all_vars(Fml, data)
 
-    terms = attr(stats::terms.formula(Fml), 'variables')
+    terms = attr(terms.formula(Fml), 'variables')
     DVs = all.names(terms[2])
     if(length(DVs) == 3){
       message(paste('Bivariate response:', DVs[2], 'and', DVs[3]))
       Y = as.matrix(df[,match(DVs[2:length(DVs)], colnames(df))])
-      DV = c(DVs[2], DVs[3])
     }else if(length(DVs) == 1){
       message(paste('Univariate response:', DVs[1:length(DVs)]))
       Y = as.matrix(df[,match(DVs[1:length(DVs)], colnames(df))])
-      DV = DVs[1]
     }else{
       stop('Dependent variables should be univariate or bivariate.')
     }
@@ -97,14 +95,18 @@ MMeM_terms <- function(fml, data, factor_X){
     re_term = stringr::str_extract_all(format(terms[length(terms)]), "(?<=\\|).+?(?=\\))")[[1]]
     re_strip = gsub(" ", "", re_term, fixed = TRUE)
     re_data = df[,match(re_strip, colnames(df))]
-    Z = stats::model.matrix(~ -1 + factor(re_data))
+    Z = model.matrix(~ -1 + factor(re_data))
 
     IV = all.names(terms[-c(1,2,length(terms))])
-    IV_data = df[,match(IV, colnames(df))]
-    if(factor_X == TRUE){
-      X = stats::model.matrix(~ factor(IV_data))
+    if(len(IV) != 1){
+      stop('Now only support one predictor in the model')
     }else{
-      X = stats::model.matrix(~ IV_data)
+      IV_data = df[,match(IV, colnames(df))]
+    }
+    if(factor_X == TRUE){
+      X = model.matrix(~ factor(IV_data))
+    }else{
+      X = model.matrix(~ IV_data)
     }
 
 
@@ -113,7 +115,7 @@ MMeM_terms <- function(fml, data, factor_X){
     q = ncol(as.matrix(Y))
   }
 
-  return(list(X = X, Z = Z, Y = Y, N =N, I =I, q=q, DV = DV))
+  return(list(X = X, Z = Z, Y = Y, N =N, I =I, q=q))
 }
 
 
