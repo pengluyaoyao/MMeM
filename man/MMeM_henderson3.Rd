@@ -31,5 +31,5 @@ data = simdata, factor_X = TRUE)
 }
 }
 \references{
-Wesolowska‐Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665-674.
+Wesolowska Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665,674.
 }

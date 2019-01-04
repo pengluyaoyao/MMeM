@@ -16,7 +16,7 @@
 #' @return \code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects with corresponding standard errors;
 #' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals with corresponding standard errors;
 #'
-#' @references Wesolowska Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665-674.
+#' @references Wesolowska Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665,674.
 #' @importFrom psych tr
 #' @importFrom stringr str_extract_all
 #' @export
