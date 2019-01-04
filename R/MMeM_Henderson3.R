@@ -16,7 +16,7 @@
 #' @return \code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects with corresponding standard errors;
 #' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals with corresponding standard errors;
 #'
-#' @references Wesolowska‐Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665-674.
+#' @references Wesolowska Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665-674.
 #' @importFrom psych tr
 #' @importFrom stringr str_extract_all
 #' @export
@@ -102,9 +102,10 @@ MMeM_terms <- function(fml, data, factor_X){
     IV = all.names(terms[-c(1,2,length(terms))])
     if(length(IV) != 1){
       stop('Now only support one predictor in the model')
-    }else{
-      IV_data = df[,match(IV, colnames(df))]
     }
+
+    IV_data = df[,match(IV, colnames(df))]
+
     if(factor_X == TRUE){
       X = stats::model.matrix(~ factor(IV_data))
     }else{

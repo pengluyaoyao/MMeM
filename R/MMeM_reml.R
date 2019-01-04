@@ -168,10 +168,9 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
 
     if(matrixcalc::is.singular.matrix(as.matrix(Bc))){
       stop('Information matrix is not invertible, please increase the levels of the rando effects')
-    }else{
-      thetas <- solve(Bc)%*%as.matrix(dc)
     }
 
+    thetas <- solve(Bc)%*%as.matrix(dc)
 
     T.new = matrix(0,q,q)
     T.new[upper.tri(T.new,diag=TRUE)] =thetas[odd(1:length(thetas))]
@@ -284,9 +283,10 @@ MMeM_terms <- function(fml, data, factor_X){
     IV = all.names(terms[-c(1,2,length(terms))])
     if(length(IV) != 1){
       stop('Now only support one predictor in the model')
-    }else{
-      IV_data = df[,match(IV, colnames(df))]
     }
+
+    IV_data = df[,match(IV, colnames(df))]
+
     if(factor_X == TRUE){
       X = stats::model.matrix(~ factor(IV_data))
     }else{
