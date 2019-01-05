@@ -19,8 +19,8 @@ distinguished by vertical bars '|' separating expressions for design matrices fr
 \value{
 The function returns a list with the following objects:
 \itemize{
-\item \code{T.estimates} is the estimated variance covariance components of the variance covariance matrix of the block random effects with corresponding sampling variances
-\item \code{E.estimates} is the estimated variance covariance components of the variance covariance matrix of the residuals with corresponding sampling variances
+\item \code{T.estimates} is the estimated variance covariance components (T.estimates) of the variance covariance matrix of the block random effects with corresponding sampling variances (T.variance)
+\item \code{E.estimates} is the estimated variance covariance components (E.estimates) of the variance covariance matrix of the residuals with corresponding sampling variances (E.variance)
 }
 }
 \description{
