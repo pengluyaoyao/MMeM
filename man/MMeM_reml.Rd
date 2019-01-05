@@ -26,9 +26,13 @@ distinguished by vertical bars '|' separating expressions for design matrices fr
 \item{tol}{the convergence tolerance}
 }
 \value{
-the output \code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects;
-\code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals; \code{VCOV} is the asymptotic
-dispersion matrix of the estimated variance covariance components.
+The function returns a list with the following objects:
+\itemize{
+\item \code{T.estimates} is the estimated variance covariance components of the variance covariance matrix of the block random effects
+\item \code{E.estimates} is the estimated variance covariance components of the variance covariance matrix of the residuals
+\item \code{VCOV} is the asymptotic
+dispersion matrix of the estimated variance covariance components for the block random effects and the residuals.
+}
 }
 \description{
 Estimating the variance components under the multivariate mixed effects model using REML methods
@@ -37,7 +41,7 @@ Estimating the variance components under the multivariate mixed effects model us
 Suppose n observational units, q variates, p fixed effects coefficients and s random effects units.
 The model supports multivariate mixed effects model for one-way randomized block design with equal design matrices:
 \deqn{Y = XB + ZU + E}
-where Y is n by q reponse matrix;
+where Y is n by q response variates matrix;
 X is n by p design matrix for the fixed effects;
 B is p by q coefficients matrix for the fixed effects;
 Z is n by s design matrix for the random effects;

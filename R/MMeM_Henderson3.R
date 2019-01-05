@@ -13,8 +13,13 @@
 #' results_henderson <- MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec),
 #' data = simdata, factor_X = TRUE)
 #' }
-#' @return \code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects with corresponding standard errors;
-#' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals with corresponding standard errors;
+#' @return
+#' The function returns a list with the following objects:
+#' \itemize{
+#' \item \code{T.estimates} is the estimated variance covariance components (T.estimates) of the variance covariance matrix of the block random effects with corresponding sampling variances (T.variance)
+#' \item \code{E.estimates} is the estimated variance covariance components (E.estimates) of the variance covariance matrix of the residuals with corresponding sampling variances (E.variance)
+#' }
+#'
 #'
 #' @references Wesolowska Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665,674.
 #' @importFrom psych tr

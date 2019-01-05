@@ -16,7 +16,7 @@
 #' Suppose n observational units, q variates, p fixed effects coefficients and s random effects units.
 #' The model supports multivariate mixed effects model for one-way randomized block design with equal design matrices:
 #' \deqn{Y = XB + ZU + E}
-#' where Y is n by q reponse matrix;
+#' where Y is n by q response variates matrix;
 #' X is n by p design matrix for the fixed effects;
 #' B is p by q coefficients matrix for the fixed effects;
 #' Z is n by s design matrix for the random effects;
@@ -29,9 +29,15 @@
 #' b is p by 1 coefficients vector for the fixed effects;
 #' u is s by 1 matrix for the random effects.
 #'
-#' @return the output \code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects;
-#' \code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals; \code{VCOV} is the asymptotic
-#' dispersion matrix of the estimated variance covariance components.
+#' @return
+#' The function returns a list with the following objects:
+#' \itemize{
+#' \item \code{T.estimates} is the estimated variance covariance components of the variance covariance matrix of the block random effects
+#' \item \code{E.estimates} is the estimated variance covariance components of the variance covariance matrix of the residuals
+#' \item \code{VCOV} is the asymptotic
+#' dispersion matrix of the estimated variance covariance components for the block random effects and the residuals.
+#' }
+#'
 #' @examples
 #' \dontrun{
 #' data(simdata)

@@ -6,7 +6,8 @@
 \alias{MMeM-package}
 \title{MMeM: Estimating the variance covariance components of the multivariate mixed effects model}
 \description{
-Analyzing data under multivariate mixed effects model using multivariate REML and multivariate Henderson3 methods.
+This package analyzes data under multivariate mixed effects model using multivariate REML and multivariate Henderson3 methods.
+Currently, it only supports multivariate mixed effects model with one fixed effects and one random effects and two response variates.
 }
 \author{
 Luyao Peng \email{luyaopeng.cn@gmail.com}

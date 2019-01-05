@@ -17,8 +17,11 @@ distinguished by vertical bars '|' separating expressions for design matrices fr
 \item{factor_X}{(logical) indicating whether predictor is a factor or continuous. By default is TRUE}
 }
 \value{
-\code{T.estimates} is the estimated matrix of the variance covariance matrix of the block random effects with corresponding standard errors;
-\code{E.estimates} is the estimated matrix of the variance covariance matrix of the residuals with corresponding standard errors;
+The function returns a list with the following objects:
+\itemize{
+\item \code{T.estimates} is the estimated variance covariance components of the variance covariance matrix of the block random effects with corresponding sampling variances
+\item \code{E.estimates} is the estimated variance covariance components of the variance covariance matrix of the residuals with corresponding sampling variances
+}
 }
 \description{
 Multivariate Henderson3 method
