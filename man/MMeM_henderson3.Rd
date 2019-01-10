@@ -27,11 +27,10 @@ The function returns a list with the following objects:
 Multivariate Henderson3 method
 }
 \examples{
-\dontrun{
 data(simdata)
 results_henderson <- MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec),
 data = simdata, factor_X = TRUE)
-}
+
 }
 \references{
 Wesolowska Janczarek, M. T. "Estimation of covariance matrices in unbalanced random and mixed multivariate models." Biometrical journal 26.6 (1984): 665,674.

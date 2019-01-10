@@ -8,11 +8,10 @@
 #' @param data data frame containing the variables named in formula.
 #' @param factor_X (logical) indicating whether predictor is a factor or continuous. By default is TRUE
 #' @examples
-#' \dontrun{
 #' data(simdata)
 #' results_henderson <- MMeM_henderson3(fml = c(V1,V2) ~ X_vec + (1|Z_vec),
 #' data = simdata, factor_X = TRUE)
-#' }
+#'
 #' @return
 #' The function returns a list with the following objects:
 #' \itemize{

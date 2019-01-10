@@ -39,15 +39,15 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
+#'
 #' data(simdata)
 #' T.start <- matrix(c(10,5,5,15),2,2)
 #' E.start <- matrix(c(10,1,1,3),2,2)
 #' results_reml <- MMeM_reml(fml = c(V1,V2) ~ X_vec + (1|Z_vec), data = simdata,
 #' factor_X = TRUE, T.start = T.start, E.start = E.start, maxit = 10)
-#' }
 #'
-#' @references Meyer, K. A. R. I. N. "Maximum likelihood estimation of variance components for a multivariate mixed model with equal design matrices." Biometrics 1985: 153,165.
+#'
+#' @references Meyer, K. "Maximum likelihood estimation of variance components for a multivariate mixed model with equal design matrices." Biometrics 1985: 153,165.
 #'
 #' @importFrom matrixcalc is.diagonal.matrix
 #' @importFrom matrixcalc is.singular.matrix
@@ -173,7 +173,7 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
     }
 
     if(matrixcalc::is.singular.matrix(as.matrix(Bc))){
-      stop('Information matrix is not invertible, please increase the levels of the rando effects')
+      stop('Information matrix is not invertible, please increase the levels of the random effects')
     }
 
     thetas <- solve(Bc)%*%as.matrix(dc)
@@ -227,7 +227,12 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
   rownames(Vcov) = names
   colnames(Vcov) = names
 
-  return(list(T.estimates = T[upper.tri(T,diag=TRUE)], E.estimates = E[upper.tri(E, diag = TRUE)], VCOV = Vcov))
+  T.df = data.frame(T[upper.tri(T,diag=TRUE)])
+  colnames(T.df) = Tnames
+  E.df = data.frame(E[upper.tri(E, diag = TRUE)])
+  colnames(E.df) = Enames
+
+  return(list(T.estimates = T.df, E.estimates = E.df, VCOV = Vcov))
 }
 ## utility functions
 find_Q <- function(T,E,q){
