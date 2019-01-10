@@ -227,10 +227,11 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
   rownames(Vcov) = names
   colnames(Vcov) = names
 
-  T.df = data.frame(T[upper.tri(T,diag=TRUE)])
-  colnames(T.df) = Tnames
-  E.df = data.frame(E[upper.tri(E, diag = TRUE)])
-  colnames(E.df) = Enames
+  for(i in length(Tnames)){
+
+  }
+  T.df = data.frame(T.estimates = T[upper.tri(T,diag=TRUE)], row.names = Tnames)
+  E.df = data.frame(E.estimates = E[upper.tri(E, diag = TRUE)], row.names = Enames)
 
   return(list(T.estimates = T.df, E.estimates = E.df, VCOV = Vcov))
 }
