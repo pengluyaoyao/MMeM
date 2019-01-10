@@ -81,6 +81,12 @@ MMeM_reml <- function(fml, data, factor_X, T.start, E.start, maxit=50, tol = 0.0
     }
   }
 
+  if(q ==1){
+    if(dim(as.matrix(T))[1] > 1 ){
+      stop('Initial variance components should be a scalar')
+    }
+  }
+
   ###ZHZ
   H = I-X%*%MASS::ginv(t(X)%*%X)%*%t(X)
   h = ncol(X)
