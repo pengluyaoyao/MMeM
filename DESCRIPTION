@@ -14,6 +14,7 @@ Authors@R:
            email = "rkzyang@gmail.com"))
 Maintainer: Luyao Peng <luyaopeng.cn@gmail.com>
 Description: Analyzing data under multivariate mixed effects model using multivariate REML and multivariate Henderson3 methods.
+ See Meyer (1985) <doi:10.2307/2530651> and Wesolowska Janczarek (1984) <doi:10.1002/bimj.4710260613>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

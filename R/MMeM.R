@@ -5,8 +5,8 @@
 #' @author Rui Yang \email{ray.cn.us@gmail.com}
 #' @description
 #' This package analyzes data under multivariate mixed effects model using multivariate REML and multivariate Henderson3 methods.
-#' Currently, it only supports multivariate mixed effects model with one fixed effects and one random effects and two response variates.
-#'
+#' Currently, it only supports multivariate mixed effects model with one fixed effects and one random effects and two response
+#' variates.
 #' See Meyer (1985) <doi:10.2307/2530651> and Wesolowska Janczarek (1984) <doi:10.1002/bimj.4710260613>.
 #'
 #' @docType package
