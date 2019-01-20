@@ -1,4 +1,4 @@
-# MMeM (Multivariate Mixed-effects Model)
+# MMeM (Multivariate Mixed-effects Model) https://travis-ci.org/pengluyaoyao/MMeM.svg?branch=master
 
 # Description
 
