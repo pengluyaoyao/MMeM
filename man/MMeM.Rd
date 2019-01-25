@@ -11,6 +11,13 @@ Currently, it only supports multivariate mixed effects model with one fixed effe
 variates.
 See Meyer (1985) <doi:10.2307/2530651> and Wesolowska Janczarek (1984) <doi:10.1002/bimj.4710260613>.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/pengluyaoyao/MMeM/issues}
+}
+
+}
 \author{
 Luyao Peng \email{luyaopeng.cn@gmail.com}
 
