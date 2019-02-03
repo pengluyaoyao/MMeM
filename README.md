@@ -10,6 +10,17 @@ Estimating the variance covariance components matrix under the multivariate mixe
 - Multivariate REML method  
 - Multivariate Henderson3 method
 
+# Installation
+To install from CRAN:
+
+install.packages("MMeM")
+library(MMeM)
+
+You can also use devtools to install the latest development version:
+
+devtools::install_github("pengluyaoyao/MMeM")
+library(MMeM)
+
 # Examples
 
 - bivariate mixed effects model:
