@@ -13,13 +13,17 @@ Estimating the variance covariance components matrix under the multivariate mixe
 # Installation
 To install from CRAN:
 
+```
 install.packages("MMeM")
 library(MMeM)
+```
 
 You can also use devtools to install the latest development version:
 
+```
 devtools::install_github("pengluyaoyao/MMeM")
 library(MMeM)
+```
 
 # Examples
 
