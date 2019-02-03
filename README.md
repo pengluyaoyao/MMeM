@@ -39,14 +39,14 @@ library(MMeM)
 ```
 - univariate mixed effects model:
 ```
+# using lme4 to analyze univariate mixed effects model:
 alcohol1 <- read.table("https://stats.idre.ucla.edu/stat/r/examples/alda/data/alcohol1_pp.txt", header=T, sep=",")
 attach(alcohol1)
 mod1<-lme4::lmer(alcuse ~ age  +(1|id) ,alcohol1,REML=1)
 summary(mod1)
 library(merDeriv)
 vcov(mod1, full =TRUE)
-# # var <-model.c$apVar
-#
+# Compare with lme4:
 T.start = 3
 E.start = 4
 results = MMeM_reml(alcuse ~ age + (1|id), alcohol1, factor_X = FALSE, T.start, E.start)
