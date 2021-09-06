@@ -66,14 +66,14 @@
 #
 # alcohol1 <- read.table("https://stats.idre.ucla.edu/stat/r/examples/alda/data/alcohol1_pp.txt", header=T, sep=",")
 # attach(alcohol1)
-# # model.c <- nlme::lme(alcuse ~ coa, data=alcohol1, random= ~ 1 | id)
-# # mod1<-lme4::lmer(alcuse ~ age  +(1|id) ,alcohol1,REML=1)
-# # summary(mod1)
-# # stats::vcov(mod1, full =TRUE)
-# # var <-model.c$apVar
+# model.c <- nlme::lme(alcuse ~ coa, data=alcohol1, random= ~ 1 | id)
+# mod1<-lme4::lmer(alcuse ~ age  +(1|id) ,alcohol1,REML=1)
+# summary(mod1)
+# stats::vcov(mod1, full =TRUE)
+# var <-model.c$apVar
 #
 # T.start = 3
 # E.start = 4
-# results = MMeM_reml(alcuse ~ age + (1|id), alcohol1, factor_X = FALSE, T.start, E.start)
+# results = MMeM::MMeM_reml(alcuse ~ age + (1|id), alcohol1, factor_X = FALSE, T.start, E.start)
 
 
