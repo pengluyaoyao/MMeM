@@ -1,5 +1,5 @@
 # MMeM (Multivariate Mixed-effects Model) 
-[![Build Status](https://travis-ci.org/pengluyaoyao/MMeM.svg?branch=master)](https://travis-ci.org/pengluyaoyao/MMeM)[![Rdoc](http://www.rdocumentation.org/badges/version/MMeM)](http://www.rdocumentation.org/packages/MMeM)[![](https://cranlogs.r-pkg.org/badges/MMeM)](https://cran.r-project.org/package=MMeM)
+[![Build Status](https://travis-ci.org/pengluyaoyao/MMeM.svg?branch=master)](https://travis-ci.org/pengluyaoyao/MMeM)[![Rdoc](http://www.rdocumentation.org/badges/version/MMeM)](https://www.rdocumentation.org/packages/MMeM)[![](https://cranlogs.r-pkg.org/badges/MMeM)](https://cran.r-project.org/package=MMeM)
 
 # Description
 
